@@ -22,14 +22,31 @@ int fsh_pwd() {
 int fsh_cd(const char *path) {
     static char previous_dir[PATH_MAX]; // Stocke le précédent répertoire
     char current_dir[PATH_MAX]; // Buffer pour le répertoire courant
+    const char *home = getenv("HOME"); // Récupère $HOME
 
     if (getcwd(current_dir, sizeof(current_dir)) == NULL) { // Récupère le répertoire courant
         perror("cd");
         return 1;
     }
 
-    // Si path est NULL ou "-", on retourne au précédent
-    if (path == NULL || strcmp(path, "-") == 0) {
+    // Si path est NULL, on retourne vers $HOME
+    if (path == NULL) {
+        if (home == NULL) {
+            fprintf(stderr, "Erreur: HOME non défini\n");
+            return 1;
+        }
+        if (chdir(home) == 0) { // Change au répertoire HOME
+            strcpy(previous_dir, current_dir); // Mémorise le répertoire courant
+            return 0;
+        }
+        else {
+            perror("cd");
+            return 1;
+        }
+    }
+
+    // Si path est "-", on retourne au précédent
+    if (strcmp(path, "-") == 0) {
         if (chdir(previous_dir) == 0) { // Change au répertoire précédent
             strcpy(previous_dir, current_dir); // Mémorise le répertoire courant
             fsh_pwd();

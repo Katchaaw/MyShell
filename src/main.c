@@ -35,7 +35,7 @@ int main() {
         char *arg = strtok(NULL, " ");
 
         if (command == NULL) { // Si aucune commande n'est saisie
-            free(line); e
+            free(line);
             continue;
         }
 
@@ -57,7 +57,7 @@ int main() {
                 last_return = fsh_ftype(arg); // ftype
             } else {
                 fprintf(stderr, "ftype: argument requis\n");
-                last_return = 1
+                last_return = 1;
             }
         }
 
@@ -79,7 +79,7 @@ int main() {
             else { // Processus parent
                 int status;
                 waitpid(pid, &status, 0); // Attend la fin du processus enfant
-                last_return = WIFEXITED(status) ? WEXITSTATUS(status) : 1;r
+                last_return = WIFEXITED(status) ? WEXITSTATUS(status) : 1;
             }
         }
 

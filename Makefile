@@ -1,7 +1,7 @@
 # Variables
 CC = gcc
 CFLAGS = -Wall -Wextra -g
-LIBS = -lreadline
+LIBS = -lreadline  #Gestion de libreadline
 
 # Cibles
 TARGET = fsh
@@ -13,7 +13,7 @@ INCLUDE = $(SRC)/include
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIBS)
 
-# Compilation des fichiers .c
+# Compilation des '.c'
 $(SRC)/main.o: $(SRC)/main.c $(INCLUDE)/commands.h
 	$(CC) $(CFLAGS) -I$(INCLUDE) -c $(SRC)/main.c -o $(SRC)/main.o
 
@@ -25,4 +25,4 @@ clean:
 	rm -f $(OBJ) $(TARGET)
 
 # Dépendances
-.PHONY: clean
+.PHONY: clean   # Indique que 'clean' n'est pas un fichier.

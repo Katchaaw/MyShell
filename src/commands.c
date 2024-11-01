@@ -8,9 +8,9 @@
 
 // Affiche le répertoire courant
 int fsh_pwd() {
-    char cwd[PATH_MAX];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("%s\n", cwd);
+    char cwd[PATH_MAX]; // Buffer pour stocker le chemin du répertoire courant
+    if (getcwd(cwd, sizeof(cwd)) != NULL) { // Récupère le répertoire courant
+        printf("%s\n", cwd); // Affiche le chemin
         return 0;
     } else {
         perror("pwd");
@@ -20,18 +20,18 @@ int fsh_pwd() {
 
 // Change de répertoire
 int fsh_cd(const char *path) {
-    static char previous_dir[PATH_MAX];
-    char current_dir[PATH_MAX];
+    static char previous_dir[PATH_MAX]; // Stocke le précédent répertoire
+    char current_dir[PATH_MAX]; // Buffer pour le répertoire courant
 
-    if (getcwd(current_dir, sizeof(current_dir)) == NULL) {
+    if (getcwd(current_dir, sizeof(current_dir)) == NULL) { // Récupère le répertoire courant
         perror("cd");
         return 1;
     }
 
-    // Si path est "-", on retourne au précédent
+    // Si path est NULL ou "-", on retourne au précédent
     if (path == NULL || strcmp(path, "-") == 0) {
-        if (chdir(previous_dir) == 0) {
-            strcpy(previous_dir, current_dir);
+        if (chdir(previous_dir) == 0) { // Change au répertoire précédent
+            strcpy(previous_dir, current_dir); // Mémorise le répertoire courant
             fsh_pwd();
             return 0;
         } else {
@@ -40,9 +40,9 @@ int fsh_cd(const char *path) {
         }
     }
 
-    // Sinon on change pour le path donné
-    if (chdir(path) == 0) {
-        strcpy(previous_dir, current_dir);
+    // Sinon, on change pour le path donné
+    if (chdir(path) == 0) { // Change au chemin spécifié
+        strcpy(previous_dir, current_dir); // Mémorise le répertoire courant
         return 0;
     } else {
         perror("cd");
@@ -57,23 +57,31 @@ int fsh_exit(int exit_code) {
 
 // Affiche le type de fichier
 int fsh_ftype(const char *path) {
-    struct stat path_stat;
+    struct stat path_stat; // Structure pour stocker les informations sur le fichier
 
-    if (stat(path, &path_stat) == -1) {
+    if (stat(path, &path_stat) == -1) { // Récupère les informations sur le fichier
         perror("ftype");
         return 1;
     }
 
-    if (S_ISREG(path_stat.st_mode)) {
-        printf("regular file\n");
-    } else if (S_ISDIR(path_stat.st_mode)) {
-        printf("directory\n");
-    } else if (S_ISLNK(path_stat.st_mode)) {
-        printf("symbolic link\n");
-    } else if (S_ISFIFO(path_stat.st_mode)) {
-        printf("named pipe\n");
-    } else {
-        printf("other\n");
+    // Vérifie le type de fichier et affiche le résultat
+    switch (path_stat.st_mode & S_IFMT) {
+        case S_IFREG:
+            printf("Fichier Ordinaire\n");
+            break;
+        case S_IFDIR:
+            printf("Répertoire\n");
+            break;
+        case S_IFLNK:
+            printf("Lien symbolique\n");
+            break;
+        case S_IFIFO:
+            printf("Tube nommé\n");
+            break;
+        default:
+            printf("Autre\n");
+            break;
     }
+
     return 0;
 }

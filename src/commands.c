@@ -39,8 +39,7 @@ int fsh_cd(const char *path) {
         if (chdir(home) == 0) { // Change au répertoire HOME
             strcpy(previous_dir, current_dir); // Mémorise le répertoire courant
             return 0;
-        }
-        else {
+        } else {
             perror("cd");
             return 1;
         }
@@ -104,10 +103,6 @@ int fsh_ftype(const char *path) {
     return 0;
 }
 
-
-
-
-
 // Fonction pour exécuter une commande avec un fichier
 int execute_command(const char *cmd, const char *file) {
     char command[1024];
@@ -119,7 +114,7 @@ int execute_command(const char *cmd, const char *file) {
         // Calculer la longueur de la commande
         size_t cmd_len = strlen(command);
         size_t file_len = strlen(file);
-        
+
         // Créer un nouveau buffer pour la commande modifiée
         char new_cmd[1024];
         snprintf(new_cmd, pos - command + 1, "%s", command);
@@ -133,6 +128,7 @@ int execute_command(const char *cmd, const char *file) {
     return 0;
 }
 
+// Fonction pour parcourir un répertoire et exécuter une commande pour chaque fichier
 int fsh_for(const char *rep, const char *cmd) {
     DIR *dir = opendir(rep);
     if (dir == NULL) {
@@ -157,23 +153,3 @@ int fsh_for(const char *rep, const char *cmd) {
     closedir(dir);
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -24,4 +24,11 @@ int fsh_exit(int exit_code);
 // Retourne 0 si le type est affiché avec succès, 1 sinon.
 int fsh_ftype(const char *path);
 
+// Parcourt les fichiers d'un répertoire donné et exécute une commande pour chaque fichier.
+// Paramètres:
+//  - rep : chemin vers le répertoire à parcourir.
+//  - cmd_start : commande à exécuter pour chaque fichier, avec $F représentant le chemin du fichier.
+// Retourne 0 en cas de succès, 1 sinon.
+int fsh_for(const char *rep, const char *cmd_start);
+
 #endif

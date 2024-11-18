@@ -96,3 +96,30 @@ int fsh_ftype(const char *path) {
 
     return 0;
 }
+
+int handle_interns(char *command, char *arg, int *last_return) {
+    if (strcmp(command, "pwd") == 0) {
+        *last_return = fsh_pwd();
+    }
+    else if (strcmp(command, "cd") == 0) {
+        *last_return = fsh_cd(arg);
+    }
+    else if (strcmp(command, "exit") == 0) {
+        int exit_code = arg ? atoi(arg) : *last_return;
+        fsh_exit(exit_code);
+        return -1; // On ne retourne jamais après un exit, mais il est nécessaire de renvoyer un statut
+    }
+    else if (strcmp(command, "ftype") == 0) {
+        if (arg) {
+            *last_return = fsh_ftype(arg);
+        } else {
+            fprintf(stderr, "ftype: argument requis\n");
+            *last_return = 1;
+        }
+    }
+    else {
+        // Commande non interne
+        return 1;
+    }
+    return 0; // Commande interne traitée avec succès
+}

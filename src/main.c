@@ -36,19 +36,10 @@ int main() {
         }
 
         // Gestion des commandes internes
-        if (strcmp(command, "pwd") == 0) {
-            last_return = fsh_pwd();
-        }
-        else if (strcmp(command, "cd") == 0) {
-            last_return = fsh_cd(arg);
-        }
-        else if (strcmp(command, "exit") == 0) {
-            int exit_code = arg ? atoi(arg) : last_return;
+        if (handle_interns(command, arg, &last_return) == 0) {
             free(line);
-            fsh_exit(exit_code);
+            continue;;
         }
-
-
 
         if (strcmp(command, "for") == 0) {
             // Variables pour stocker la syntaxe de la boucle

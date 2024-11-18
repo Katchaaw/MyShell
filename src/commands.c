@@ -8,10 +8,6 @@ int execute_command(const char *cmd, const char *file) {
     // Remplace $F par le nom du fichier
     char *pos = strstr(command, "$F");
     if (pos != NULL) {
-        // Calculer la longueur de la commande
-        size_t cmd_len = strlen(command);
-        size_t file_len = strlen(file);
-        
         // Créer un nouveau buffer pour la commande modifiée
         char new_cmd[1024];
         snprintf(new_cmd, pos - command + 1, "%s", command);

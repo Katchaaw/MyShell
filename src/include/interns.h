@@ -24,4 +24,7 @@ int fsh_exit(int exit_code);
 // Retourne 0 si le type est affiché avec succès, 1 sinon.
 int fsh_ftype(const char *path);
 
+// Gestion des commandes internes
+int handle_interns(char *command, char *arg, int *last_return);
+
 #endif

@@ -47,15 +47,10 @@ int main() {
             free(line);
             fsh_exit(exit_code);
         }
-        else if (strcmp(command, "ftype") == 0) {
-            if (arg) {
-                last_return = fsh_ftype(arg);
-            } else {
-                fprintf(stderr, "ftype: argument requis\n");
-                last_return = 1;
-            }
-        }
-        else if (strcmp(command, "for") == 0) {
+
+
+
+        if (strcmp(command, "for") == 0) {
             // Variables pour stocker la syntaxe de la boucle
             char *var = arg; // La variable F
             char *in = strtok(NULL, " "); // Le mot-clé "in"

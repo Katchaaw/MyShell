@@ -21,12 +21,20 @@ int main() {
         add_history(line); // Ajoute la ligne à l'historique des commandes
         cleanup_tokens(tokens, &nb_tokens); // Reinitialisation des tokens
 
+        // Copier la ligne lue avant l'appel à tokenizer
+        char *copy_line = strdup(line);
+        if (!copy_line) { // Vérifier l'échec de strdup
+            perror("Erreur de copie de la ligne");
+            free(line);
+            continue;  // Continue avec la prochaine itération
+        }
+
         // Appel de la fonction tokenizer pour remplir le tableau de tokens
-        tokenizer(line, tokens, &nb_tokens, " ");
+        tokenizer(copy_line, tokens, &nb_tokens, " ");
 
         // Sépare la ligne en commande et argument
-        char *command = tokens[0];
-        char *arg = (nb_tokens > 1) ? tokens[1] : NULL;
+        char *command = strtok(line, " ");
+        char *arg = strtok(NULL, " ");
 
         if (command == NULL) { // Si aucune commande n'est saisie
             free(line);
@@ -35,7 +43,7 @@ int main() {
 
         // Gestion des commandes internes
         if (handle_interns(command, arg, &last_return) == 0) {
-            free(line);
+            //free(line);
             continue;;
         }
 

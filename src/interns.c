@@ -43,7 +43,6 @@ int fsh_cd(const char *path) {
     if (strcmp(path, "-") == 0) {
         if (chdir(previous_dir) == 0) { // Change au répertoire précédent
             strcpy(previous_dir, current_dir); // Mémorise le répertoire courant
-            fsh_pwd();
             return 0;
         } else {
             perror("cd");
@@ -70,7 +69,7 @@ int fsh_exit(int exit_code) {
 int fsh_ftype(const char *path) {
     struct stat path_stat; // Structure pour stocker les informations sur le fichier
 
-    if (stat(path, &path_stat) == -1) { // Récupère les informations sur le fichier
+    if (lstat(path, &path_stat) == -1) { // Récupère les informations sur le fichier
         perror("ftype");
         return 1;
     }
@@ -78,19 +77,19 @@ int fsh_ftype(const char *path) {
     // Vérifie le type de fichier et affiche le résultat
     switch (path_stat.st_mode & S_IFMT) {
         case S_IFREG:
-            printf("Fichier Ordinaire\n");
+            printf("regular file\n");
             break;
         case S_IFDIR:
-            printf("Répertoire\n");
+            printf("directory\n");
             break;
         case S_IFLNK:
-            printf("Lien symbolique\n");
+            printf("symbolic link\n");
             break;
         case S_IFIFO:
-            printf("Tube nommé\n");
+            printf("named pipe\n");
             break;
         default:
-            printf("Autre\n");
+            printf("other\n");
             break;
     }
 

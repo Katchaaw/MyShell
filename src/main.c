@@ -43,7 +43,7 @@ int main() {
 
         // Gestion des commandes internes
         if (handle_interns(command, arg, &last_return) == 0) {
-            //free(line);
+            free(line);
             continue;;
         }
 

@@ -17,8 +17,6 @@
 #include "interns.h"
 #include "tokenizer.h"
 #include "commands.h"
-
-
-#define PROMPT_SIZE 32
+#include "prompt.h"
 
 #endif

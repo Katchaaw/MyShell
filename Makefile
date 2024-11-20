@@ -6,7 +6,7 @@ LIBS = -lreadline  # Gestion de libreadline
 # Cibles
 TARGET = fsh
 SRC = src
-OBJ = $(SRC)/main.o $(SRC)/commands.o $(SRC)/tokenizer.o $(SRC)/interns.o
+OBJ = $(SRC)/main.o $(SRC)/commands.o $(SRC)/tokenizer.o $(SRC)/interns.o $(SRC)/prompt.o
 INCLUDE = $(SRC)/include
 
 # Compilation principale

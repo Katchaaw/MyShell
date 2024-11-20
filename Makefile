@@ -1,24 +1,21 @@
 # Variables
 CC = gcc
 CFLAGS = -Wall -Wextra -g
-LIBS = -lreadline  #Gestion de libreadline
+LIBS = -lreadline  # Gestion de libreadline
 
 # Cibles
 TARGET = fsh
 SRC = src
-OBJ = $(SRC)/main.o $(SRC)/commands.o
+OBJ = $(SRC)/main.o $(SRC)/commands.o $(SRC)/tokenizer.o $(SRC)/interns.o
 INCLUDE = $(SRC)/include
 
 # Compilation principale
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LIBS)
 
-# Compilation des '.c'
-$(SRC)/main.o: $(SRC)/main.c $(INCLUDE)/commands.h
-	$(CC) $(CFLAGS) -I$(INCLUDE) -c $(SRC)/main.c -o $(SRC)/main.o
-
-$(SRC)/commands.o: $(SRC)/commands.c $(INCLUDE)/commands.h
-	$(CC) $(CFLAGS) -I$(INCLUDE) -c $(SRC)/commands.c -o $(SRC)/commands.o
+# Compilation des objets
+$(SRC)/%.o: $(SRC)/%.c $(INCLUDE)/%.h
+	$(CC) $(CFLAGS) -I$(INCLUDE) -c $< -o $@
 
 # Nettoyage
 clean:

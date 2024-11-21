@@ -14,9 +14,15 @@ int main() {
         line = readline(prompt);
 
         if (!line) { // Si readline retourne NULL (CTRL+D, CTRL+C...)
-            printf("exit\n");
             break;
         }
+
+        // Vérifier si la ligne est vide ou ne contient que des espaces
+        if (line[0] == '\0' || strspn(line, " \t") == strlen(line)) {
+            free(line);
+            continue;  
+        }
+
 
         add_history(line); // Ajoute la ligne à l'historique des commandes
         cleanup_tokens(tokens, &nb_tokens); // Reinitialisation des tokens
@@ -96,21 +102,29 @@ int main() {
             if (pid == -1) {
                 perror("Erreur fork");
                 last_return = 1;
-            }
-
+            } 
+            
             else if (pid == 0) { // Processus enfant
-                if (execlp(command, command, arg, (char *)NULL) == -1) {
+                // Prépare les arguments pour execvp
+                char *argv[MAX_TOKENS + 1] = {command};
+                for (int i = 1; i < nb_tokens; i++) {
+                    argv[i] = tokens[i];
+                }
+                argv[nb_tokens] = NULL;
+
+                // Exécute la commande
+                if (execvp(command, argv) == -1) {
                     perror("Erreur exec");
                     exit(1);
                 }
-            }
-
+            } 
+            
             else { // Processus parent
                 int status;
                 waitpid(pid, &status, 0); // Attend la fin du processus enfant
                 last_return = WIFEXITED(status) ? WEXITSTATUS(status) : 1;
             }
-        }
+    }
 
         free(line);
     }

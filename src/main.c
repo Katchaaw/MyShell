@@ -1,4 +1,37 @@
 #include "main.h"
+#include <sys/wait.h>
+#include <unistd.h>
+
+int execute_external_command(char *cmd, char **args) {
+    pid_t pid = fork(); // Crée un processus fils
+
+    if (pid == -1) {
+        perror("fork");
+        return 1; 
+    }
+
+    if (pid == 0) {
+        // Dans le processus fils, on exécute la commande
+        if (execvp(cmd, args) == -1) { 
+            perror("execvp");
+            exit(1);
+        }
+    } else {
+        // Processus père
+        int status;
+        waitpid(pid, &status, 0); // Attend que le fils se termine
+
+        if (WIFEXITED(status)) {
+            return WEXITSTATUS(status);
+        } else {
+            return 1; 
+        }
+    }
+
+    return 0;
+}
+
+
 
 int main() {
     char *line; // Stock la ligne lue par l'utilisateur
@@ -17,11 +50,11 @@ int main() {
             break;
         }
 
-        // Vérifier si la ligne est vide ou ne contient que des espaces
         if (line[0] == '\0' || strspn(line, " \t") == strlen(line)) {
             free(line);
-            continue;  
+            continue;
         }
+
 
 
         add_history(line); // Ajoute la ligne à l'historique des commandes
@@ -37,6 +70,8 @@ int main() {
 
         // Appel de la fonction tokenizer pour remplir le tableau de tokens
         tokenizer(copy_line, tokens, &nb_tokens, " ");
+
+        free(copy_line);
 
         // Sépare la ligne en commande et argument
         char *command = strtok(line, " ");
@@ -97,37 +132,22 @@ int main() {
                 last_return = 1;
             }
         }
-        else { // Gestion des commandes externes
-            pid_t pid = fork(); // Crée un nouveau processus
-            if (pid == -1) {
-                perror("Erreur fork");
-                last_return = 1;
-            } 
-            
-            else if (pid == 0) { // Processus enfant
-                // Prépare les arguments pour execvp
-                char *argv[MAX_TOKENS + 1] = {command};
-                for (int i = 1; i < nb_tokens; i++) {
-                    argv[i] = tokens[i];
-                }
-                argv[nb_tokens] = NULL;
 
-                // Exécute la commande
-                if (execvp(command, argv) == -1) {
-                    perror("Erreur exec");
-                    exit(1);
-                }
-            } 
-            
-            else { // Processus parent
-                int status;
-                waitpid(pid, &status, 0); // Attend la fin du processus enfant
-                last_return = WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+        else { // Gestion des commandes externes
+            // Préparation des arguments pour execvp
+            char *argv[MAX_TOKENS + 1] = {command};
+            for (int i = 1; i < nb_tokens; i++) {
+                argv[i] = tokens[i];
             }
-    }
+            argv[nb_tokens] = NULL;
+
+            // Appel à la fonction pour exécuter la commande externe
+            last_return = execute_external_command(command, argv);
+        }
 
         free(line);
     }
 
     return 0;
 }
+

@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 int execute_external_command(char *cmd, char **args) {
-    pid_t pid = fork(); // Crée un processus fils
+    pid_t pid = fork();
 
     if (pid == -1) {
         perror("fork");
@@ -88,6 +88,7 @@ int main() {
             continue;;
         }
 
+        //Gestion des boucles for
         if (strcmp(command, "for") == 0) {
             // Variables pour stocker la syntaxe de la boucle
             char *var = arg; // La variable F
@@ -133,7 +134,8 @@ int main() {
             }
         }
 
-        else { // Gestion des commandes externes
+        // Gestion des commandes externes
+        else { 
             // Préparation des arguments pour execvp
             char *argv[MAX_TOKENS + 1] = {command};
             for (int i = 1; i < nb_tokens; i++) {

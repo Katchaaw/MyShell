@@ -7,7 +7,7 @@ int get_fixed_prompt_length(int last_return) {
     if (last_return == 0) {
         len += 1;  // "0" a une seule longueur
     } else {
-        len += (int) log10(last_return) + 1;  // pour la longueur du nombre
+        return (int) log10(last_return) + 4;  // pour la longueur du nombre
     }
     return len; 
 }
@@ -31,7 +31,7 @@ char* generate_prompt(int last_return) {
 
     // Obtient le répertoire courant et le tronque pour respecter la limite
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        truncate_path(cwd, truncated_cwd, PROMPT_TOTAL_LENGTH - fixed_prompt_len);  // utiliser la longueur dynamique
+        truncate_path(cwd, truncated_cwd, PROMPT_TOTAL_LENGTH - fixed_prompt_len);  // Utiliser la longueur dynamique
     } else {
         perror("Erreur getcwd");
         strcpy(truncated_cwd, "?");

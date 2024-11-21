@@ -49,23 +49,3 @@ int fsh_for(const char *rep, const char *cmd) {
     closedir(dir);
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

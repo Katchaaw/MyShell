@@ -116,9 +116,11 @@ int handle_interns(char *command, char *arg, int *last_return) {
             *last_return = 1;
         }
     }
+    
+    // Commande non interne
     else {
-        // Commande non interne
         return 1;
     }
+    
     return 0; // Commande interne traitée avec succès
 }

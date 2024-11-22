@@ -1,7 +1,7 @@
 # Variables
 CC = gcc
-CFLAGS = -Wall -Wextra -g
-LIBS = -lreadline  # Gestion de libreadline
+CFLAGS = -Wall -Wextra -g 
+LIBS = -lreadline -lm # Gestion de libreadline
 
 # Cibles
 TARGET = fsh

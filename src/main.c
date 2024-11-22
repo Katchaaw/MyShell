@@ -50,7 +50,7 @@ int main() {
             break;
         }
 
-        if (line[0] == '\0' || strspn(line, " \t") == strlen(line)) {
+        if (line == NULL || line[0] == '\0' || strspn(line, " \t") == strlen(line)) {
             free(line);
             continue;
         }
@@ -150,6 +150,7 @@ int main() {
         free(line);
     }
 
+    exit(last_return); 
     return 0;
 }
 

@@ -1,6 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+// Bibliothèques.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,7 +15,9 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
+// Modules internes.
 #include "interns.h"
+#include "externs.h"
 #include "tokenizer.h"
 #include "commands.h"
 #include "prompt.h"

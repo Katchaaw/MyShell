@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <math.h>
 
 // Modules internes.
 #include "interns.h"

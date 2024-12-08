@@ -5,8 +5,9 @@ int fsh_pwd() {
     char cwd[PATH_MAX]; 
 
     // Récupère et affiche le répertoire courant
-    if (getcwd(cwd, sizeof(cwd)) != NULL) { 
-        printf("%s\n", cwd); 
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {  
+        write(1, cwd, strlen(cwd));
+        write(1, "\n", 1);
         return 0;
     } 
 
@@ -80,19 +81,19 @@ int fsh_ftype(const char *path) {
     // Vérifie et affiche le type de fichier
     switch (path_stat.st_mode & S_IFMT) {
         case S_IFREG:
-            printf("regular file\n");
+            write(1, "regular file\n", 13);       
             break;
         case S_IFDIR:
-            printf("directory\n");
+            write(1, "directory\n", 10);
             break;
         case S_IFLNK:
-            printf("symbolic link\n");
+            write(1, "symbolic link\n", 15);
             break;
         case S_IFIFO:
-            printf("named pipe\n");
+            write(1, "named pipe\n", 11);
             break;
         default:
-            printf("other\n");
+            write(1, "other\n", 6);
             break;
     }
 

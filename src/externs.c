@@ -1,4 +1,4 @@
-#include "externs.h"
+#include "main.h"
 
 int execute_external_command(char *cmd, char **args) {
     // Création d'un fils

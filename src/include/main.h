@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <fcntl.h>
 
 // Modules internes.
 #include "interns.h"
@@ -21,5 +22,6 @@
 #include "tokenizer.h"
 #include "commands.h"
 #include "prompt.h"
+#include "redirections.h"
 
 #endif

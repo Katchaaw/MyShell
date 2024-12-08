@@ -9,6 +9,8 @@ int main() {
     rl_outstream = stderr; // Redirige la sortie de readline vers stderr
 
     while (1) {
+        reset_redirections();
+        
         // Génère et affiche le prompt
         char *prompt = generate_prompt(last_return);
 
@@ -38,6 +40,13 @@ int main() {
         // Tokenisation de la ligne
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
+
+        // Appel à la gestion des redirections
+        if (handle_redirections(tokens, &nb_tokens) == 1) {
+            last_return = 1;
+            free(line);
+            continue;
+        }
 
         // Séparation commande / argument
         char *command = strtok(line, " ");

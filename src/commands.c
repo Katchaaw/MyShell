@@ -57,7 +57,6 @@ int execute_command(const char *cmd, const char *file) {
     return 1;
 }
 
-
 int fsh_for(const char *rep, const char *cmd) {
     // Ouverture du répertoire
     DIR *dir = opendir(rep);

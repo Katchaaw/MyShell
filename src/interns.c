@@ -81,19 +81,24 @@ int fsh_ftype(const char *path) {
     // Vérifie et affiche le type de fichier
     switch (path_stat.st_mode & S_IFMT) {
         case S_IFREG:
-            write(1, "regular file\n", 13);       
+            write(1,"regular file", 12) ;
+            write(1, "\n", 1);      
             break;
         case S_IFDIR:
-            write(1, "directory\n", 10);
+            write(1, "directory", 9) ;
+            write(1, "\n", 1);
             break;
         case S_IFLNK:
-            write(1, "symbolic link\n", 15);
+            write(1, "symbolic link", 13) ;
+            write(1, "\n", 1);
             break;
         case S_IFIFO:
-            write(1, "named pipe\n", 11);
+            write(1, "named pipe", 10) ;
+            write(1, "\n", 1);
             break;
         default:
-            write(1, "other\n", 6);
+            write(1, "other", 5);
+            write(1, "\n", 1);
             break;
     }
 

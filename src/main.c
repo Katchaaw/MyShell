@@ -8,6 +8,8 @@ int main() {
 
     rl_outstream = stderr; // Redirige la sortie de readline vers stderr
 
+    save_redirections();
+
     while (1) {
         reset_redirections();
         
@@ -124,7 +126,8 @@ int main() {
         free(line);
     }
 
-    cleanup_tokens(tokens, &nb_tokens); 
+    cleanup_tokens(tokens, &nb_tokens);
+    close_saved_redirections();
     exit(last_return); 
     return 0;
 }

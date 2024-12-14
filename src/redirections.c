@@ -70,13 +70,25 @@ int handle_redirections(char **tokens, int *nb_tokens) {
     return 0;
 }
 
-void reset_redirections() {
-    // Réinitialisation des descripteurs de fichiers 0, 1, 2
-    int fd = open("/dev/tty", O_RDWR);
-    if (fd != -1) {
-        dup2(fd, 0);
-        dup2(fd, 1);
-        dup2(fd, 2);
-        close(fd);
+static int saved_stdin, saved_stdout, saved_stderr;
+
+void save_redirections() {
+    if ((saved_stdin = dup(STDIN_FILENO)) == -1 ||
+        (saved_stdout = dup(STDOUT_FILENO)) == -1 ||
+        (saved_stderr = dup(STDERR_FILENO)) == -1) {
+        perror("Erreur lors de la sauvegarde des redirections");
+        exit(1);
     }
+}
+
+void reset_redirections() {
+    dup2(saved_stdin, STDIN_FILENO);
+    dup2(saved_stdout, STDOUT_FILENO);
+    dup2(saved_stderr, STDERR_FILENO);
+}
+
+void close_saved_redirections() {
+    close(saved_stdin);
+    close(saved_stdout);
+    close(saved_stderr);
 }

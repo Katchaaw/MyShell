@@ -1,38 +1,63 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <errno.h>
-#include "for.h"
+#include "main.h"
 
-int fsh_for(const char *rep, const char *cmd); // Prototypage pour exécuter une boucle "for"
+int fsh_for(const char *rep, const char *cmd) {
+    //printf("DEBUG: Début de la boucle 'for' avec répertoire : %s et commande : %s\n", rep, cmd);
+    
+    // Ouverture du répertoire
+    DIR *dir = opendir(rep);
+    if (dir == NULL) {
+        perror("Erreur lors de l'ouverture du répertoire");
+        return 1;
+    }
+
+    // Parcours des fichiers du répertoire.
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        if (entry->d_name[0] == '.'){
+            //printf("DEBUG: Fichier ignoré : %s (fichier caché ou spécial)\n", entry->d_name);
+            continue;
+        }
+
+        char filepath[1024];
+        snprintf(filepath, sizeof(filepath), "%s/%s", rep, entry->d_name);
+        //printf("DEBUG: Fichier trouvé : %s\n", filepath);
+
+        // Exécute la commande pour le fichier courant
+        //printf("DEBUG: Exécution de la commande pour le fichier : %s\n", filepath);
+        execute_command(cmd, filepath);
+        //printf("DEBUG: Résultat de la commande pour %s : %d\n", filepath, result);
+    }
+
+    closedir(dir);
+    //printf("DEBUG: Fin de la boucle 'for' pour le répertoire : %s\n", rep);
+    return 0;
+}
+
 
 int handle_for(char *arg, int *last_return) {
-    // Gestion des boucles for
+    //printf("DEBUG: Gestion de la boucle 'for' avec argument : %s\n", arg);
+
     char *var = arg;              // La variable F
     char *in = strtok(NULL, " "); // Le mot-clé "in"
     char *rep = strtok(NULL, " "); // Le répertoire
 
+    //printf("DEBUG: Variable : %s, Mot-clé : %s, Répertoire : %s\n", var, in, rep);
+
     if (var && in && rep && strcmp(in, "in") == 0) {
-        // Utilisation de strtok pour découper la partie de la commande entre '{' et '}'
         char *cmd_start = strtok(NULL, "{");
         if (cmd_start != NULL) {
             cmd_start++; // Décaler pour ignorer le '{'
-
-            // Chercher la fermeture avec '}' et la remplacer par '\0' pour terminer la commande
             char *cmd_end = strchr(cmd_start, '}');
             if (cmd_end != NULL) {
                 *cmd_end = '\0'; 
 
-                // Nettoyer cmd_start pour enlever les espaces superflus
                 while (*cmd_start == ' ' || *cmd_start == '\t') {
                     cmd_start++;
                 }
 
-                // Vérifie la syntaxe de la commande (variable, mot-clé "in", répertoire)
+                //printf("DEBUG: Commande extraite pour la boucle : %s\n", cmd_start);
+
                 if (strlen(var) == 1) {
-                    // Exécute la boucle pour chaque fichier
                     *last_return = fsh_for(rep, cmd_start);
                 } else {
                     fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
@@ -51,5 +76,6 @@ int handle_for(char *arg, int *last_return) {
         *last_return = 1;
     }
 
-    return 0; // Retourne 0 pour indiquer que la boucle "for" a été gérée
+    //printf("DEBUG: Fin de la gestion de la boucle 'for'\n");
+    return 0;
 }

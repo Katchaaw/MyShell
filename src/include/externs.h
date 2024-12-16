@@ -1,11 +1,6 @@
 #ifndef EXTERNS_H
 #define EXTERNS_H
 
-#include <unistd.h>
-#include <sys/wait.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 /**
  * Exécute une commande externe en utilisant `execvp`.
  *

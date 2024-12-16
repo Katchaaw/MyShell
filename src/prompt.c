@@ -1,5 +1,4 @@
 #include "main.h"
-#include <math.h>  // pour log10()
 
 
 int get_fixed_prompt_length(int last_return) {

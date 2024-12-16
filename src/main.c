@@ -8,7 +8,11 @@ int main() {
 
     rl_outstream = stderr; // Redirige la sortie de readline vers stderr
 
+    save_redirections();
+
     while (1) {
+        reset_redirections();
+        
         // Génère et affiche le prompt
         char *prompt = generate_prompt(last_return);
 
@@ -38,6 +42,13 @@ int main() {
         // Tokenisation de la ligne
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
+
+        // Appel à la gestion des redirections
+        if (handle_redirections(tokens, &nb_tokens) == 1) {
+            last_return = 1;
+            free(line);
+            continue;
+        }
 
         // Séparation commande / argument
         char *command = strtok(line, " ");
@@ -69,53 +80,16 @@ int main() {
 
         //Gestion des boucles for
         if (strcmp(command, "for") == 0) {
-            // Variables pour stocker la syntaxe de la boucle
-            char *var = arg; // La variable F
-            char *in = strtok(NULL, " "); // Le mot-clé "in"
-            char *rep = strtok(NULL, " "); // Le répertoire
-
-            if (var && in && rep && strcmp(in, "in") == 0) {
-                // Utilisation de strtok pour découper la partie de la commande entre '{' et '}'
-                char *cmd_start = strtok(NULL, "{");
-                if (cmd_start != NULL) {
-                    cmd_start++; // Décaler pour ignorer le '{'
-
-                    // Chercher la fermeture avec '}'et la remplacer par '\0' pour terminer la commande
-                    char *cmd_end = strchr(cmd_start, '}');
-                    if (cmd_end != NULL) {
-                        *cmd_end = '\0'; 
-
-                        // Nettoyer cmd_start pour enlever les espaces superflus
-                        while (*cmd_start == ' ' || *cmd_start == '\t') {
-                            cmd_start++;
-                        }
-
-                        // Vérifie la syntaxe de la commande (variable, mot-clé "in", répertoire)
-                        if (strlen(var) == 1) {
-                            // Exécute la boucle pour chaque fichier
-                            last_return = fsh_for(rep, cmd_start);
-                        } else {
-                            fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
-                            last_return = 1;
-                        }
-                    } else {
-                        fprintf(stderr, "Erreur: '}' manquant\n");
-                        last_return = 1;
-                    }
-                } else {
-                    fprintf(stderr, "Erreur: '{' manquant\n");
-                    last_return = 1;
-                }
-            } else {
-                fprintf(stderr, "Erreur: syntaxe incorrecte, la commande doit être : for F in REP { CMD }\n");
-                last_return = 1;
-            }
+            handle_for(arg, &last_return);
+            free(line);
+            continue;
         }
-
+        
         free(line);
     }
 
-    cleanup_tokens(tokens, &nb_tokens); 
+    cleanup_tokens(tokens, &nb_tokens);
+    close_saved_redirections();
     exit(last_return); 
     return 0;
 }

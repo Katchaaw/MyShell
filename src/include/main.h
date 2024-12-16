@@ -24,5 +24,6 @@
 #include "commands.h"
 #include "prompt.h"
 #include "redirections.h"
+#include "for.h"
 
 #endif

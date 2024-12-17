@@ -59,7 +59,7 @@ int handle_for(char *arg, int *last_return) {
         while (segment != NULL) {
             // Ajouter le segment à la commande complète avec un espace
             strcat(full_command, segment);
-            strcat(full_command, " ");
+            strcat(full_command, "}");
 
             // Vérifier s'il reste quelque chose après '}'
             segment = strtok(NULL, "}"); // Chercher le prochain segment
@@ -72,7 +72,7 @@ int handle_for(char *arg, int *last_return) {
         }
 
         // Debug : Afficher la commande complète
-        //printf("DEBUG: Commande extraite pour la boucle : %s \n", cmd_final);
+        printf("DEBUG: Commande extraite pour la boucle : %s \n", cmd_final);
 
         if (strlen(var) == 1) {
             *last_return = fsh_for(rep, cmd_final);

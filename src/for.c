@@ -1,7 +1,7 @@
 #include "main.h"
 
 int fsh_for(const char *rep, const char *cmd) {
-    //printf("DEBUG: Début de la boucle 'for' avec répertoire : %s et commande : %s\n", rep, cmd);
+    //printf("DEBUG: Début de la boucle 'for' avec répertoire : |%s| et commande : |%s|\n", rep, cmd);
     
     // Ouverture du répertoire
     DIR *dir = opendir(rep);
@@ -32,43 +32,52 @@ int fsh_for(const char *rep, const char *cmd) {
     //printf("DEBUG: Fin de la boucle 'for' pour le répertoire : %s\n", rep);
     return 0;
 }
-
+#define MAX_CMD_LENGTH 1024 // Taille maximale de la commande
 
 int handle_for(char *arg, int *last_return) {
-    //printf("DEBUG: Gestion de la boucle 'for' avec argument : %s\n", arg);
-
-    char *var = arg;              // La variable F
-    char *in = strtok(NULL, " "); // Le mot-clé "in"
+    char *var = arg;               // La variable F
+    char *in = strtok(NULL, " ");  // Le mot-clé "in"
     char *rep = strtok(NULL, " "); // Le répertoire
-
-    //printf("DEBUG: Variable : %s, Mot-clé : %s, Répertoire : %s\n", var, in, rep);
+    printf("rep : %s\n",rep);
 
     if (var && in && rep && strcmp(in, "in") == 0) {
-        char *cmd_start = strtok(NULL, "{");
-        if (cmd_start != NULL) {
-            cmd_start++; // Décaler pour ignorer le '{'
-            char *cmd_end = strchr(cmd_start, '}');
-            if (cmd_end != NULL) {
-                *cmd_end = '\0'; 
-
-                while (*cmd_start == ' ' || *cmd_start == '\t') {
-                    cmd_start++;
-                }
-
-                //printf("DEBUG: Commande extraite pour la boucle : %s\n", cmd_start);
-
-                if (strlen(var) == 1) {
-                    *last_return = fsh_for(rep, cmd_start);
-                } else {
-                    fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
-                    *last_return = 1;
-                }
-            } else {
-                fprintf(stderr, "Erreur: '}' manquant\n");
-                *last_return = 1;
-            }
-        } else {
+        char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
+        if (cmd_start == NULL) {
             fprintf(stderr, "Erreur: '{' manquant\n");
+            *last_return = 1;
+            return 1;
+        }
+        cmd_start++;
+        //printf("cmd_start : %s\n",cmd_start);
+
+        char full_command[MAX_CMD_LENGTH] = {0}; // Pour la commande complète
+        strcat(full_command, cmd_start);
+        //strcat(full_command, " ");
+
+        char *segment = strtok(NULL, "}");       // Premier segment jusqu'à '}'
+
+        while (segment != NULL) {
+            // Ajouter le segment à la commande complète avec un espace
+            strcat(full_command, segment);
+            strcat(full_command, " ");
+
+            // Vérifier s'il reste quelque chose après '}'
+            segment = strtok(NULL, "}"); // Chercher le prochain segment
+        }
+
+        // Nettoyer la commande finale (supprimer les espaces inutiles)
+        char *cmd_final = full_command;
+        while (*cmd_final == ' ' || *cmd_final == '\t') {
+            cmd_final++;
+        }
+
+        // Debug : Afficher la commande complète
+        //printf("DEBUG: Commande extraite pour la boucle : %s \n", cmd_final);
+
+        if (strlen(var) == 1) {
+            *last_return = fsh_for(rep, cmd_final);
+        } else {
+            fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
             *last_return = 1;
         }
     } else {
@@ -76,6 +85,6 @@ int handle_for(char *arg, int *last_return) {
         *last_return = 1;
     }
 
-    //printf("DEBUG: Fin de la gestion de la boucle 'for'\n");
     return 0;
 }
+

@@ -68,6 +68,7 @@ int main() {
         // Gestion des commandes externes
         else { 
             // Préparation des arguments pour execvp
+  
             char *argv[MAX_TOKENS + 1] = {command};
             for (int i = 1; i < nb_tokens; i++) {
                 argv[i] = tokens[i];
@@ -80,6 +81,7 @@ int main() {
 
         //Gestion des boucles for
         if (strcmp(command, "for") == 0) {
+            printf("foooooor : %s\n",arg);
             handle_for(arg, &last_return);
             free(line);
             continue;

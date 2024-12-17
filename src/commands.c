@@ -5,7 +5,7 @@ int execute_external_command(char *cmd, char **args);
 
 
 int execute_command(const char *cmd, const char *file) {
-    //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
+    printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
 
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);

@@ -1,8 +1,8 @@
 #include "main.h"
 
-int fsh_for(const char *rep, const char *cmd,const char *opt) {
+int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext) {
     //printf("DEBUG: Début de la boucle 'for' avec répertoire : |%s| et commande : |%s|\n", rep, cmd);
-    printf("option for : [%s]",opt);
+    printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]",opt_A,opt_r,opt_ext);
     // Ouverture du répertoire
     DIR *dir = opendir(rep);
     if (dir == NULL) {
@@ -36,16 +36,30 @@ int fsh_for(const char *rep, const char *cmd,const char *opt) {
 
 int handle_for(char *arg, int *last_return) {
     int have_opt = 0;
+    int opt_A =0;
+    int opt_r =0;
+    char *ext = "";
+
     char *var = arg;               // La variable F
     char *in = strtok(NULL, " ");  // Le mot-clé "in"
     char *rep = strtok(NULL, " "); // Le répertoire
     printf("rep : %s\n",rep);
     char *opt = strtok(NULL," ");
-    printf("opt : |%s|\n",opt);
+
+    while (strcmp(opt, "{")!=0 && *opt !='\0'){    
+        printf("opt : |%s|\n",opt);
+        if (strcmp(opt, "-A")==0){
+            have_opt = 0;opt_A=1;
+        }   
+        else if (strcmp(opt, "-r")==0){
+            have_opt = 0;opt_r=1;
+        }
+        else if (strcmp(opt, "-e")==0){
+            have_opt = 0;ext = strtok(NULL, " ");
+        }
         
-    if (strcmp(opt, "-A")==0 || strcmp(opt, "r")==0){
-        have_opt = 1;
-    }   
+        opt = strtok(NULL," ");
+    }
 
     if (var && in && rep && strcmp(in, "in") == 0) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
@@ -85,7 +99,7 @@ int handle_for(char *arg, int *last_return) {
 
         if (strlen(var) == 1) {
             //strcat(full_command, "\0");
-            *last_return = fsh_for(rep, cmd_final,opt);
+            *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext);
         } else {
             fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
             *last_return = 1;

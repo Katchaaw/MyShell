@@ -5,7 +5,7 @@ int execute_external_command(char *cmd, char **args);
 
 
 int execute_command(const char *cmd, const char *file) {
-    printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
+    //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
 
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
@@ -32,6 +32,8 @@ int execute_command(const char *cmd, const char *file) {
         // Avancer pour remplacer les autres occurrences
         pos = command + len_before + strlen(file);
     }
+
+    //printf("\ncmd : %s ; file : %s \n",cmd,file);
 
 
     // Tokenisation de la commande.
@@ -65,13 +67,13 @@ int execute_command(const char *cmd, const char *file) {
             //printf("DEBUG: Commande à exécuter : %s, Premier argument : %s\n", cmd_name, arg ? arg : "NULL");
             cleanup_tokens(tokens, &nb_tokens); 
             free(command_copy);
+   
             return last_return;
         }
 
         // Commande externe
         int result = execute_external_command(cmd_name, tokens);
         //printf("DEBUG: Commande externe exécutée avec code retour : %d\n", result);
-
 
         cleanup_tokens(tokens, &nb_tokens); 
         free(command_copy);

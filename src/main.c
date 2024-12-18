@@ -64,6 +64,12 @@ int main() {
             free(line);
             continue;;
         }
+        //Gestion des boucles for
+        else if (strcmp(command, "for") == 0) {
+            handle_for(arg, &last_return);
+            free(line);
+            continue;
+        }
 
         // Gestion des commandes externes
         else { 
@@ -79,12 +85,7 @@ int main() {
             last_return = execute_external_command(command, argv);
         }
 
-        //Gestion des boucles for
-        if (strcmp(command, "for") == 0) {
-            handle_for(arg, &last_return);
-            free(line);
-            continue;
-        }
+       
         
         free(line);
     }

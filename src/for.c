@@ -2,8 +2,8 @@
 
 int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext,char opt_type) { //char opt_type
     //printf("DEBUG: Début de la boucle 'for' avec répertoire : |%s| et commande : |%s|\n", rep, cmd);
-    printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]\n, option -t : [%d]\n",opt_A,opt_r,opt_ext,opt_type);
-    printf("après print");
+    //printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]\n, option -t : [%d]\n",opt_A,opt_r,opt_ext,opt_type);
+    //printf("après print");
     // Ouverture du répertoire
     DIR *dir = opendir(rep);
     if (dir == NULL) {
@@ -25,6 +25,7 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
 
         // Exécute la commande pour le fichier courant
         //printf("DEBUG: Exécution de la commande pour le fichier : %s\n", filepath);
+        //printf("avant exec commande\n");
         execute_command(cmd, filepath);
         //printf("DEBUG: Résultat de la commande pour %s : %d\n", filepath, result);
     }

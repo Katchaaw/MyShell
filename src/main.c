@@ -50,6 +50,13 @@ int main() {
             continue;
         }
 
+        // Gestion des structures if
+        if (handle_if(tokens, &nb_tokens, NULL) != 0) {
+            last_return = 1;
+            free(line);
+        }
+        continue;
+
         // Séparation commande / argument
         char *command = strtok(line, " ");
         char *arg = strtok(NULL, " ");

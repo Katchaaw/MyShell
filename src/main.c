@@ -43,19 +43,42 @@ int main() {
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
 
+        /* Affichage des tokens pour déboguer
+        printf("Avant redirection : ");
+        for (int i = 0; i < nb_tokens; i++) {
+            printf("'%s' ", tokens[i]);
+        }
+        printf("\n");*/
+
         // Appel à la gestion des redirections
         if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
             continue;
         }
+        
+        /*
+        printf("Après redirection : ");
+        for (int i = 0; i < nb_tokens; i++) {
+            printf("'%s' ", tokens[i]);
+        }
+        printf("\n");*/
+
+        // Modifie la ligne pour supprimer les redirections
+        line[0] = '\0';  // Vide la ligne initiale
+        for (int i = 0; i < nb_tokens; i++) {
+            if (i > 0) {
+                strcat(line, " ");  // Ajoute un espace entre les tokens
+            }
+            strcat(line, tokens[i]);  // Concatène chaque token à 'line'
+        }
 
         // Gestion des structures if
         if (handle_if(tokens, &nb_tokens, NULL) != 0) {
             last_return = 1;
             free(line);
+            continue;
         }
-        continue;
 
         // Séparation commande / argument
         char *command = strtok(line, " ");
@@ -69,7 +92,7 @@ int main() {
         // Gestion des commandes internes
         if (handle_interns(command, arg, &last_return) == 0) {
             free(line);
-            continue;;
+            continue;
         }
 
         // Gestion des commandes externes

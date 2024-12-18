@@ -73,12 +73,13 @@ int main() {
             strcat(line, tokens[i]);  // Concatène chaque token à 'line'
         }
 
-        // Gestion des structures if
-        if (handle_if(tokens, &nb_tokens, NULL) != 0) {
-            last_return = 1;
-            free(line);
-            continue;
+        if (strcmp(tokens[0], "if") == 0) {
+            if (handle_if_else(tokens, &nb_tokens, &last_return) == 0) {
+                free(line);
+                continue;
+            }
         }
+
 
         // Séparation commande / argument
         char *command = strtok(line, " ");

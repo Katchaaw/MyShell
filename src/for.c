@@ -1,8 +1,9 @@
 #include "main.h"
 
-int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext,int test) { //char opt_type
+int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext,char opt_type) { //char opt_type
     //printf("DEBUG: Début de la boucle 'for' avec répertoire : |%s| et commande : |%s|\n", rep, cmd);
-    printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]\n",opt_A,opt_r,opt_ext);
+    printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]\n, option -t : [%d]\n",opt_A,opt_r,opt_ext,opt_type);
+    printf("après print");
     // Ouverture du répertoire
     DIR *dir = opendir(rep);
     if (dir == NULL) {
@@ -39,14 +40,14 @@ int handle_for(char *arg, int *last_return) {
     int opt_A =0;
     int opt_r =0;
     char *ext = "";
-    char *type0;
+    char *type0= "";
 
     char *var = arg;               // La variable F
     char *in = strtok(NULL, " ");  // Le mot-clé "in"
     char *rep = strtok(NULL, " "); // Le répertoire
     printf("rep : %s\n",rep);
     char *opt = strtok(NULL," ");
-
+    printf("Avant,opt : |%s|\n",opt);
     while (strcmp(opt, "{")!=0 && *opt !='\0'){    
         printf("opt : |%s|\n",opt);
         if (strcmp(opt, "-A")==0){
@@ -63,11 +64,12 @@ int handle_for(char *arg, int *last_return) {
         if (strcmp(opt, "-t")==0){
             printf("before");            
             type0 = strtok(NULL, " ");
-            printf("type0 : ",type0);
+            printf("type0 : %s",type0);
         }
         
         opt = strtok(NULL," ");
     }
+    printf("fin while\n");
 
     if (var && in && rep && strcmp(in, "in") == 0) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
@@ -107,7 +109,8 @@ int handle_for(char *arg, int *last_return) {
 
         if (strlen(var) == 1) {
             //strcat(full_command, "\0");
-            *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext,0);
+            printf("fin handle\n");
+            *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext,*type0);
         } else {
             fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
             *last_return = 1;

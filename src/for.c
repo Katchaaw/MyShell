@@ -37,12 +37,13 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
 #define MAX_CMD_LENGTH 1024 // Taille maximale de la commande
 
 int handle_for(char *arg, int *last_return) {
+    //printf("debut for ------------------------\n");
     int have_opt = 0;
     int opt_A =0;
     int opt_r =0;
     char *ext = "";
     char *type0= "";
-
+    //printf("arg : |%s|",arg);
     char *var = arg;               // La variable F
     char *in = strtok(NULL, " ");  // Le mot-clé "in"
     char *rep = strtok(NULL, " "); // Le répertoire

@@ -53,14 +53,14 @@ int execute_command(const char *cmd, const char *file) {
         printf("[%s] ", tokens[i]);
     }
     printf("\n");*/
-
+    //printf("commande : |%s|\n",command_copy);
     // Exécution de/des commande(s)
     if (nb_tokens > 0) {
         char *cmd_name = tokens[0];
         char *arg = nb_tokens > 1 ? tokens[1] : NULL;
 
         //printf("DEBUG: Commande à exécuter : %s, Premier argument : %s\n", cmd_name, arg ? arg : "NULL");
-
+        //printf("cmdname : |%s|",cmd_name);
         // Commande interne
         int last_return = 0;
         if (handle_interns(cmd_name, arg, &last_return) == 0) {
@@ -70,7 +70,15 @@ int execute_command(const char *cmd, const char *file) {
    
             return last_return;
         }
-
+        else if (strcmp(cmd_name, "for") == 0) {
+            char *ccmd = strtok(command," ");
+            char *arg = strtok(NULL," ");
+            handle_for(arg, &last_return);
+            cleanup_tokens(tokens, &nb_tokens); 
+            free(command_copy);
+            return last_return;
+        }
+        
         // Commande externe
         int result = execute_external_command(cmd_name, tokens);
         //printf("DEBUG: Commande externe exécutée avec code retour : %d\n", result);

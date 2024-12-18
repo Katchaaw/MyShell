@@ -92,3 +92,4 @@ void close_saved_redirections() {
     close(saved_stdout);
     close(saved_stderr);
 }
+

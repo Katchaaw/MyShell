@@ -10,7 +10,7 @@ int tokenizer(char *line, char *tokens[], int *nb_tokens, const char *delimiter)
     while (token != NULL) {
         // Trop de tokens, retourne une erreur.
         if (*nb_tokens >= MAX_TOKENS) {
-            return 11;  // Retourner 1 en cas d'erreur (trop de tokens)
+            return 1;  // Retourner 1 en cas d'erreur (trop de tokens)
         }
 
         // Duplique le token extrait dans le tableau de tokens.
@@ -23,7 +23,8 @@ int tokenizer(char *line, char *tokens[], int *nb_tokens, const char *delimiter)
         (*nb_tokens)++;  // Incrémente le compteur de tokens
         token = strtok(NULL, delimiter);  // Récupère le token suivant.
     }
-
+    tokens[*nb_tokens]=NULL;
+    //(*nb_tokens)++;
     return 0;
 }
 

@@ -81,7 +81,6 @@ int main() {
 
         //Gestion des boucles for
         if (strcmp(command, "for") == 0) {
-            printf("foooooor : %s\n",arg);
             handle_for(arg, &last_return);
             free(line);
             continue;

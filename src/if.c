@@ -1,6 +1,9 @@
 #include "main.h"
 
 int handle_if(char **tokens, int *nb_tokens, const char *file) {
+    if (*nb_tokens < 2 || strcmp(tokens[0], "if") != 0) {
+        return 0;  // Ce n'est pas une commande if, laissez-la être traitée normalement
+    }
     int condition_start = -1, condition_end = -1;
     int if_block_start = -1, if_block_end = -1;
     int else_block_start = -1, else_block_end = -1;

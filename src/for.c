@@ -46,11 +46,11 @@ int handle_for(char *arg, int *last_return) {
     char *var = arg;               // La variable F
     char *in = strtok(NULL, " ");  // Le mot-clé "in"
     char *rep = strtok(NULL, " "); // Le répertoire
-    printf("rep : %s\n",rep);
+    //printf("rep : %s\n",rep);
     char *opt = strtok(NULL," ");
-    printf("Avant,opt : |%s|\n",opt);
+    //printf("Avant,opt : |%s|\n",opt);
     while (strcmp(opt, "{")!=0 && *opt !='\0'){    
-        printf("opt : |%s|\n",opt);
+        //printf("opt : |%s|\n",opt);
         if (strcmp(opt, "-A")==0){
         
             opt_A=1;
@@ -63,14 +63,14 @@ int handle_for(char *arg, int *last_return) {
         }
         printf("before0");  
         if (strcmp(opt, "-t")==0){
-            printf("before");            
+            //printf("before");            
             type0 = strtok(NULL, " ");
-            printf("type0 : %s",type0);
+            //printf("type0 : %s",type0);
         }
         
         opt = strtok(NULL," ");
     }
-    printf("fin while\n");
+    //printf("fin while\n");
 
     if (var && in && rep && strcmp(in, "in") == 0) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
@@ -106,11 +106,11 @@ int handle_for(char *arg, int *last_return) {
         }
 
         // Debug : Afficher la commande complète
-        printf("DEBUG: Commande extraite pour la boucle : %s \n", cmd_final);
+       //printf("DEBUG: Commande extraite pour la boucle : %s \n", cmd_final);
 
         if (strlen(var) == 1) {
             //strcat(full_command, "\0");
-            printf("fin handle\n");
+            //printf("fin handle\n");
             *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext,*type0);
         } else {
             fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");

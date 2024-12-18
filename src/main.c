@@ -43,12 +43,43 @@ int main() {
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
 
+        /* Affichage des tokens pour déboguer
+        printf("Avant redirection : ");
+        for (int i = 0; i < nb_tokens; i++) {
+            printf("'%s' ", tokens[i]);
+        }
+        printf("\n");*/
+
         // Appel à la gestion des redirections
         if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
             continue;
         }
+        
+        /*
+        printf("Après redirection : ");
+        for (int i = 0; i < nb_tokens; i++) {
+            printf("'%s' ", tokens[i]);
+        }
+        printf("\n");*/
+
+        // Modifie la ligne pour supprimer les redirections
+        line[0] = '\0';  // Vide la ligne initiale
+        for (int i = 0; i < nb_tokens; i++) {
+            if (i > 0) {
+                strcat(line, " ");  // Ajoute un espace entre les tokens
+            }
+            strcat(line, tokens[i]);  // Concatène chaque token à 'line'
+        }
+
+        if (strcmp(tokens[0], "if") == 0) {
+            if (handle_if_else(tokens, &nb_tokens, &last_return) == 0) {
+                free(line);
+                continue;
+            }
+        }
+
 
         // Séparation commande / argument
         char *command = strtok(line, " ");
@@ -62,19 +93,12 @@ int main() {
         // Gestion des commandes internes
         if (handle_interns(command, arg, &last_return) == 0) {
             free(line);
-            continue;;
-        }
-        //Gestion des boucles for
-        else if (strcmp(command, "for") == 0) {
-            handle_for(arg, &last_return);
-            free(line);
             continue;
         }
 
         // Gestion des commandes externes
         else { 
             // Préparation des arguments pour execvp
-  
             char *argv[MAX_TOKENS + 1] = {command};
             for (int i = 1; i < nb_tokens; i++) {
                 argv[i] = tokens[i];
@@ -85,7 +109,12 @@ int main() {
             last_return = execute_external_command(command, argv);
         }
 
-       
+        //Gestion des boucles for
+        if (strcmp(command, "for") == 0) {
+            handle_for(arg, &last_return);
+            free(line);
+            continue;
+        }
         
         free(line);
     }
@@ -95,4 +124,5 @@ int main() {
     exit(last_return); 
     return 0;
 }
+
 

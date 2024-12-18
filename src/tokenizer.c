@@ -24,6 +24,7 @@ int tokenizer(char *line, char *tokens[], int *nb_tokens, const char *delimiter)
         token = strtok(NULL, delimiter);  // Récupère le token suivant.
     }
     tokens[*nb_tokens]=NULL;
+    //(*nb_tokens)++;
     return 0;
 }
 

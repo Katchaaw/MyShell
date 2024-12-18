@@ -30,7 +30,7 @@ int handle_redirections(char **tokens, int *nb_tokens) {
             target_fd = STDERR_FILENO;
             flags = O_WRONLY | O_CREAT | O_APPEND; // concatenation
         } else {
-            continue; // Aucun opérateur de redirection détecté
+            continue;
         }
 
         // Vérifie qu'un fichier suit l'opérateur
@@ -39,12 +39,12 @@ int handle_redirections(char **tokens, int *nb_tokens) {
             return 1;
         }
 
-        char *filename = tokens[i + 1];
-
         // Ouvre le fichier avec les bons drapeaux
+        char *filename = tokens[i + 1];
         fd = open(filename, flags, 0644);
         if (fd == -1) {
             perror("Erreur d'ouverture du fichier");
+            close(fd);
             return 1;
         }
 
@@ -92,3 +92,4 @@ void close_saved_redirections() {
     close(saved_stdout);
     close(saved_stderr);
 }
+

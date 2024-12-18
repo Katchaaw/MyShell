@@ -18,7 +18,7 @@ int execute_external_command(char *cmd, char **args) {
     // Dans le processus fils.
     if (pid == 0) {
         // Exécute la commande.
-        args[2] = NULL;
+        //args[2] = NULL;
         if (execvp(cmd, args) == -1) {
             //printf("cmd : %s\n",cmd);
             //printf("args : %s\n",args[0]);

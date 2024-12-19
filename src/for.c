@@ -32,9 +32,12 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
 
         // Gestion de l'option -e (extension)
         if (opt_ext && *opt_ext) {
-            char *dot = strrchr(entry->d_name, '.');
+            //printf("sazdazd");
+            char *dot = strrchr(filepath, '.');
             if (dot && strcmp(dot + 1, opt_ext) == 0) {
+                
                 *dot = '\0'; // Supprime l'extension
+                //printf("sazdazd:%s\n",filepath);
             } else {
                 continue; // Ignorer si l'extension ne correspond pas
             }

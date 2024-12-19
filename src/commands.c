@@ -36,10 +36,12 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
     
     // Extraire le répertoire à partir du chemin complet du fichier
     //get_directory_from_file(file, directory);
-
+    //directory = "caca";
     // Remplacement de toutes les occurrences de $F dans la commande par le chemin du fichier.
     char *pos = command;
     while ((pos = strstr(pos, "$F")) != NULL){ 
+        char *test = command;
+        if (strstr(test, "for") == NULL ){
         // Créer la nouvelle commande avec la substitution
         char new_cmd[1024];
         // Copier tout avant $F
@@ -58,12 +60,16 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
 
         // Avancer pour remplacer les autres occurrences
         pos = command + len_before + strlen(file);
+        }
+        else {break;}
     }
 
 
     
     char *pos0 = command;
     while ((pos0 = strstr(pos0, "$D")) != NULL){ 
+        char *test0 = command;
+        if (strstr(test0, "for") == NULL || strstr(test0, "in $D") != NULL){
         // Créer la nouvelle commande avec la substitution
         char new_cmd0[1024];
         // Copier tout avant $D
@@ -82,6 +88,9 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
 
         // Avancer pour remplacer les autres occurrences
         pos0 = command + len_before0 + strlen(directory);
+        }
+        else {
+            break;}
     }
 
 

@@ -42,6 +42,15 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
                 continue; // Ignorer si l'extension ne correspond pas
             }
         }
+        
+        // Récursion si -r et si c'est un répertoire
+        if (opt_r) {
+            struct stat file_stat;
+            if (stat(filepath, &file_stat) == 0 && S_ISDIR(file_stat.st_mode)) {
+                fsh_for(filepath, cmd, opt_A, opt_r, opt_ext, opt_type);
+            }
+        }
+
 
         // Gestion de l'option -t (type)
         if (opt_type) {
@@ -57,7 +66,7 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
             else if (S_ISLNK(file_stat.st_mode)) type_char = 'l';
             else if (S_ISFIFO(file_stat.st_mode)) type_char = 'p';
 
-            if (type_char != opt_type) {
+            if (type_char != opt_type ){//&& !(opt_r && type_char == 'd')) {
                 continue;
             }
         }
@@ -66,13 +75,7 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         int last_returnTemp = execute_command(cmd, filepath, filepath);
         if (last_returnTemp> last_return){last_return = last_returnTemp;}
 
-        // Récursion si -r et si c'est un répertoire
-        if (opt_r) {
-            struct stat file_stat;
-            if (stat(filepath, &file_stat) == 0 && S_ISDIR(file_stat.st_mode)) {
-                fsh_for(filepath, cmd, opt_A, opt_r, opt_ext, opt_type);
-            }
-        }
+        
     }
 
     return last_return;

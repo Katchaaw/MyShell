@@ -112,10 +112,16 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
         //printf("valMAX :%d\n", maxi(execute_command(cmd1, file, directory),execute_command(cmd2, file, directory)));
         //printf("val2 :%d\n", execute_command(cmd2, file, directory));
         //return maxi(execute_command(cmd1, file, directory),execute_command(cmd2, file, directory));
-        execute_command(cmd1, file, directory,variable);
-        return execute_command(cmd2, file, directory,variable);
+        
+            execute_command(cmd1, file, directory);
+            int result = execute_command(cmd2, file, directory);
+            
+            free(command_cop);
+
+            return result;
         }
     }
+    free(command_cop);
 
     if (variable !=NULL){
         replaceVariable(command,variable,file);

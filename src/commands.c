@@ -47,6 +47,7 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
         return execute_command(cmd2, file, directory);
         }
     }
+    free(command_cop);
 
     
 
@@ -132,6 +133,7 @@ while ((pos = strchr(pos, '$')) != NULL) {
     char *command_copy = strdup(command);
     if (!command_copy) {
         perror("Erreur d'allocation mémoire");
+        free(command_copy);
         return 1;
     }
 

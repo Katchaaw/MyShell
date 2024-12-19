@@ -43,26 +43,12 @@ int main() {
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
 
-        /* Affichage des tokens pour déboguer
-        printf("Avant redirection : ");
-        for (int i = 0; i < nb_tokens; i++) {
-            printf("'%s' ", tokens[i]);
-        }
-        printf("\n");*/
-
         // Appel à la gestion des redirections
         if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
             continue;
         }
-        
-        /*
-        printf("Après redirection : ");
-        for (int i = 0; i < nb_tokens; i++) {
-            printf("'%s' ", tokens[i]);
-        }
-        printf("\n");*/
 
         // Modifie la ligne pour supprimer les redirections
         line[0] = '\0';  // Vide la ligne initiale
@@ -80,7 +66,6 @@ int main() {
             }
         }
 
-
         // Séparation commande / argument
         char *command = strtok(line, " ");
         char *arg = strtok(NULL, " ");
@@ -95,6 +80,7 @@ int main() {
             free(line);
             continue;
         }
+
         //Gestion des boucles for
         else if (strcmp(command, "for") == 0) {
             handle_for(arg, &last_return);
@@ -114,9 +100,6 @@ int main() {
             // Exécute la commande et met a jour la valeur de retour
             last_return = execute_external_command(command, argv);
         }
-
-        
-        
         free(line);
     }
 

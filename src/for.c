@@ -1,51 +1,44 @@
 #include "main.h"
-//#define MAX_SIZE 100 // Taille maximale du dictionnaire
 
-
-int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext,char opt_type,char variable) { //char opt_type
-    //printf("DEBUG: Début de la boucle 'for' avec répertoire : |%s| et commande : |%s|\n", rep, cmd);
-    //printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]\n, option -t : [%d]\n",opt_A,opt_r,opt_ext,opt_type);
-    //printf("après print");
-    // Ouverture du répertoire
-    //char *directory;  
+int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext,char opt_type,char variable) { 
     int last_return=0;  
+
+    // Ouverture du répertoire
     DIR *dir = opendir(rep);
     if (dir == NULL) {
         perror("Erreur lors de l'ouverture du répertoire");
         return 1;
     }
 
-
     // Parcours des fichiers du répertoire.
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) {
+        // Ignorer les entrées "." et ".." si l'option -A est activée
         if ((opt_A && strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0)) {
             continue;
         }
 
-        // Gestion de l'option -A
+        // Ignorer les fichiers cachés si l'option -A n'est pas activée
         if (!opt_A && entry->d_name[0] == '.') {
             continue;
         }
 
-        // Construction du chemin complet
+        // Construire le chemin complet du fichier/répertoire courant
         char filepath[1024];
         snprintf(filepath, sizeof(filepath), "%s/%s", rep, entry->d_name);
 
-        // Gestion de l'option -e (extension)
+        // Gestion de l'option -e (filtrage par extension)
         if (opt_ext && *opt_ext) {
-            //printf("sazdazd");
-            char *dot = strrchr(filepath, '.');
+            char *dot = strrchr(filepath, '.'); // Trouver la dernière occurrence de "."
             if (dot && strcmp(dot + 1, opt_ext) == 0) {
-                
                 *dot = '\0'; // Supprime l'extension
-                //printf("sazdazd:%s\n",filepath);
-            } else {
-                continue; // Ignorer si l'extension ne correspond pas
+            } 
+            else {
+                continue; 
             }
         }
         
-        // Récursion si -r et si c'est un répertoire
+        // Récursion si l'option -r est activée et si le fichier courant est un répertoire.
         if (opt_r) {
             struct stat file_stat;
             if (stat(filepath, &file_stat) == 0 && S_ISDIR(file_stat.st_mode)) {
@@ -54,7 +47,7 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         }
 
 
-        // Gestion de l'option -t (type)
+        // Gestion de l'option -t (filtrage par type de fichier)
         if (opt_type) {
             struct stat file_stat;
             if (stat(filepath, &file_stat) == -1) {
@@ -63,12 +56,12 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
             }
 
             char type_char = '\0';
-            if (S_ISREG(file_stat.st_mode)) type_char = 'f';
-            else if (S_ISDIR(file_stat.st_mode)) type_char = 'd';
-            else if (S_ISLNK(file_stat.st_mode)) type_char = 'l';
-            else if (S_ISFIFO(file_stat.st_mode)) type_char = 'p';
+            if (S_ISREG(file_stat.st_mode)) type_char = 'f';       // Fichier régulier
+            else if (S_ISDIR(file_stat.st_mode)) type_char = 'd';  // Répertoire
+            else if (S_ISLNK(file_stat.st_mode)) type_char = 'l';  // Lien symbolique
+            else if (S_ISFIFO(file_stat.st_mode)) type_char = 'p'; // FIFO
 
-            if (type_char != opt_type ){//&& !(opt_r && type_char == 'd')) {
+            if (type_char != opt_type ){
                 continue;
             }
         }
@@ -77,31 +70,28 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         int last_returnTemp = execute_command(cmd, filepath, filepath,variable);
         if (last_returnTemp> last_return){last_return = last_returnTemp;}
 
-        
     }
     closedir(dir);
     return last_return;
 }
-#define MAX_CMD_LENGTH 1024 // Taille maximale de la commande
+
 
 int handle_for(char *arg, int *last_return) {
-    //printf("debut for ------------------------\n");
     int have_opt = 0;
     int more_cmd = 0;
     char *secCommande;
-    int opt_A =0;
-    int opt_r =0;
-    char *ext = "";
-    char *type0= "";
-    //printf("arg : |%s|",arg);
-    char *var = arg;               // La variable F
-    char *in = strtok(NULL, " ");  // Le mot-clé "in"
-    char *rep = strtok(NULL, " "); // Le répertoire
-    //printf("rep : %s\n",rep);
-    char *opt = strtok(NULL," ");
-    //printf("Avant,opt : |%s|\n",opt);
+
+    int opt_A = 0; // Option pour inclure les fichiers cachés
+    int opt_r = 0; // Option pour activer la récursion
+    char *ext = ""; // Extension à filtrer
+    char *type0 = ""; // Type de fichier à filtrer
+    char *var = arg;
+    char *in = strtok(NULL, " ");
+    char *rep = strtok(NULL, " "); // Répertoire à parcourir
+    char *opt = strtok(NULL, " "); // Options
+
+    // Analyse des options.
     while (strcmp(opt, "{")!=0 && *opt !='\0'){    
-        //printf("opt : |%s|\n",opt);
         if (strcmp(opt, "-A")==0){
             opt_A=1;
         }   
@@ -111,16 +101,11 @@ int handle_for(char *arg, int *last_return) {
         if (strcmp(opt, "-e")==0){
             ext = strtok(NULL, " ");
         }
-        //printf("before0");  
-        if (strcmp(opt, "-t")==0){
-            //printf("before");            
+        if (strcmp(opt, "-t")==0){     
             type0 = strtok(NULL, " ");
-            //printf("type0 : %s",type0);
         }
-        
         opt = strtok(NULL," ");
     }
-    //printf("fin while\n");
 
     if (var && in && rep && strcmp(in, "in") == 0) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
@@ -132,30 +117,12 @@ int handle_for(char *arg, int *last_return) {
         if (have_opt){
             cmd_start++;
         }
+
+        //Construire la commande complète.
         char full_command[MAX_CMD_LENGTH] = {0};
-
-        
-    
-        //char *pos = cmd_start;
-        //printf("-dz-d-zd--ze-d-ze-%s\n",pos);
-        /*if ((pos = strstr(pos, ";")) != NULL){
-            //printf("-dz-d-aaaaazd--ze-d-ze-\n");
-            more_cmd = 1;
-            secCommande = strtok(cmd_start,";");
-            cmd_start = strtok(NULL, "}");
-        }*/
-        
-
-        // Pour la commande complète
         strcat(full_command, cmd_start);
-        //strcat(full_command, " ");
         
-
-        //printf("deuxième : %s\n",secCommande);
-        //printf("cmd_start : %s\n",cmd_start);
-        
-        
-        char *segment = strtok(NULL, "}");       // Premier segment jusqu'à '}'
+        char *segment = strtok(NULL, "}"); // Premier segment jusqu'à '}'
 
         while (segment != NULL) {
             // Ajouter le segment à la commande complète avec un espace
@@ -172,22 +139,16 @@ int handle_for(char *arg, int *last_return) {
             cmd_final++;
         }
 
-        // Debug : Afficher la commande complète
-       //printf("DEBUG: Commande extraite pour la boucle : %s \n", cmd_final);
-
+        // Vérification de la longueur de la variable
         if (strlen(var) == 1) {
-            //strcat(full_command, "\0");
-            //printf("fin handle\n");
-            //if (more_cmd){
-              //  *last_return = fsh_for(rep, secCommande,opt_A,opt_r,ext,*type0);            
-            //}
-
             *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext,*type0,*arg);
-        } else {
+        } 
+        else {
             fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
             *last_return = 1;
         }
-    } else {
+    } 
+    else {
         fprintf(stderr, "Erreur: syntaxe incorrecte, la commande doit être : for F in REP { CMD }\n");
         *last_return = 1;
     }

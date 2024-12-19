@@ -6,6 +6,7 @@
  *
  * @param cmd Nom de la commande à exécuter.
  * @param args Tableau d'arguments pour la commande (le premier élément est `cmd`).
+ 
  * @return Le code de retour de la commande exécutée ou 1 en cas d'erreur.
  */
 int execute_external_command(char *cmd, char **args);

@@ -113,8 +113,8 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
         //printf("val2 :%d\n", execute_command(cmd2, file, directory));
         //return maxi(execute_command(cmd1, file, directory),execute_command(cmd2, file, directory));
         
-            execute_command(cmd1, file, directory);
-            int result = execute_command(cmd2, file, directory);
+            execute_command(cmd1, file, directory, variable);
+            int result = execute_command(cmd2, file, directory, variable);
             
             free(command_cop);
 

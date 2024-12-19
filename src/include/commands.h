@@ -8,6 +8,8 @@
  * @param file Le chemin du fichier à substituer à `$F`.
  * @return Le code de retour de la commande exécutée.
  */
-int execute_command(const char *cmd, const char *file,const char *directory);
+int execute_command(const char *cmd, const char *file, const char *directory,char variable);
+
+int execute_from_if(char **args);
 
 #endif

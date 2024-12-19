@@ -1,5 +1,5 @@
 #include "main.h"
-
+#define MAX_LENGTH 256
 // Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
 int execute_external_command(char *cmd, char **args);
 
@@ -21,7 +21,76 @@ int maxi (int a, int b){
     }
     return b;
 }
-int execute_command(const char *cmd, const char *file, const char *directory) {
+
+char *args_to_cmd(char **args) {
+    // Vérifier si le tableau est valide
+    if (args == NULL) return NULL;
+
+    // Calculer la taille totale nécessaire pour la chaîne finale
+    size_t total_length = 0;
+    for (int i = 0; args[i] != NULL; i++) {
+        total_length += strlen(args[i])+1;
+    }
+
+    // Allouer la mémoire pour cmd (+1 pour le caractère de fin '\0')
+    char *cmd = malloc(total_length + 1);
+    if (cmd == NULL) {
+        perror("malloc failed");
+        return NULL;
+    }
+
+    // Concaténer les chaînes dans cmd
+    cmd[0] = '\0'; // Initialiser cmd comme une chaîne vide
+    for (int i = 0; args[i] != NULL; i++) {
+        strcat(cmd, args[i]);
+        strcat(cmd, " ");
+    }
+    //printf("cmdd flattenn %s\n",cmd);
+    return cmd; // Retourner la chaîne résultante
+}
+
+
+int execute_from_if(char **args){
+    char *new_cmd = args_to_cmd(args);
+    return execute_command(new_cmd,NULL,NULL,NULL);
+}
+
+
+void replaceVariable(char *command, char variable, const char *replacement) {
+    char buffer[MAX_LENGTH];
+    char *pos = command;
+    char *match;
+    int replacement_len = strlen(replacement);
+    int variable_len = 2; // Longueur de "$variable" (1 pour '$' + 1 pour la variable)
+
+    buffer[0] = '\0'; // Initialisation du buffer
+
+    while ((match = strstr(pos, "$")) != NULL) {
+        if (*(match + 1) == variable) {
+            // Copie la partie avant "$variable" dans le buffer
+            strncat(buffer, pos, match - pos);
+
+            // Ajoute le remplacement (file)
+            strncat(buffer, replacement, replacement_len);
+
+            // Avance le pointeur après "$variable"
+            pos = match + variable_len;
+        } else {
+            // Si ce n'est pas "$variable", avance le pointeur de 1 caractère
+            strncat(buffer, pos, match - pos + 1);
+            pos = match + 1;
+        }
+    }
+
+    // Copie le reste de la chaîne dans le buffer
+    strncat(buffer, pos, MAX_LENGTH - strlen(buffer) - 1);
+
+    // Remplace le contenu de la chaîne d'origine
+    strncpy(command, buffer, MAX_LENGTH - 1);
+    command[MAX_LENGTH - 1] = '\0'; // Ajoute le terminateur nul
+}
+
+int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
     //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
 
     char command[1024];
@@ -54,9 +123,10 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
     }
     free(command_cop);
 
-    
-
-
+    if (variable !=NULL){
+        replaceVariable(command,variable,file);
+    }
+/*
     //char directory[1024];  // Pour stocker le répertoire extrait
     
     // Extraire le répertoire à partir du chemin complet du fichier
@@ -122,7 +192,7 @@ while ((pos = strchr(pos, '$')) != NULL) {
         else {
             break;}
     }
-
+    */
 
 
 
@@ -172,6 +242,15 @@ while ((pos = strchr(pos, '$')) != NULL) {
             free(command_copy);
             return last_return;
         }
+        else if (strcmp(cmd_name, "if") == 0) {
+            //printf("teeeeeeeeeeeeeeest\n");
+            
+            handle_if_else(tokens, &nb_tokens,&last_return);
+            cleanup_tokens(tokens, &nb_tokens); 
+            free(command_copy);
+            return last_return;
+        }
+        
         
         // Commande externe
         int result = execute_external_command(cmd_name, tokens);

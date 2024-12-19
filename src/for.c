@@ -16,34 +16,60 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
     // Parcours des fichiers du répertoire.
     struct dirent *entry;
     while ((entry = readdir(dir)) != NULL) {
-        if (entry->d_name[0] == '.'){
-            //printf("DEBUG: Fichier ignoré : %s (fichier caché ou spécial)\n", entry->d_name);
+        if ((opt_A && strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0)) {
             continue;
         }
 
+        // Gestion de l'option -A
+        if (!opt_A && entry->d_name[0] == '.') {
+            continue;
+        }
+
+        // Construction du chemin complet
         char filepath[1024];
         snprintf(filepath, sizeof(filepath), "%s/%s", rep, entry->d_name);
-        //printf("DEBUG: Fichier trouvé : %s\n", filepath);
 
-        char directory[1024];
-        if (realpath(rep, directory) == NULL) {
-            perror("Erreur lors de la résolution du chemin absolu");
-            closedir(dir);
-            return 1;
+        // Gestion de l'option -e (extension)
+        if (opt_ext && *opt_ext) {
+            char *dot = strrchr(entry->d_name, '.');
+            if (dot && strcmp(dot + 1, opt_ext) == 0) {
+                *dot = '\0'; // Supprime l'extension
+            } else {
+                continue; // Ignorer si l'extension ne correspond pas
+            }
         }
-        //printf("DEBUG: Fichier trouvé : %s\n", filepath);
-        //printf("DEBUG: Répertoire : %s\n", directory);
 
-        // Exécute la commande pour le fichier courant
-        //printf("DEBUG: Exécution de la commande pour le fichier : %s\n", filepath);
-        //printf("avant exec commande\n");
-        //printf("DEBUG: Début de la boucle 'for' avec répertoire : |%s| et commande : |%s|\n", rep, cmd);
-        execute_command(cmd, filepath,filepath);
-        //printf("DEBUG: Résultat de la commande pour %s : %d\n", filepath, result);
+        // Gestion de l'option -t (type)
+        if (opt_type) {
+            struct stat file_stat;
+            if (stat(filepath, &file_stat) == -1) {
+                perror("Erreur lors de l'obtention des informations du fichier");
+                continue;
+            }
+
+            char type_char = '\0';
+            if (S_ISREG(file_stat.st_mode)) type_char = 'f';
+            else if (S_ISDIR(file_stat.st_mode)) type_char = 'd';
+            else if (S_ISLNK(file_stat.st_mode)) type_char = 'l';
+            else if (S_ISFIFO(file_stat.st_mode)) type_char = 'p';
+
+            if (type_char != opt_type) {
+                continue;
+            }
+        }
+
+        // Exécuter la commande pour le fichier/répertoire courant
+        execute_command(cmd, filepath, rep);
+
+        // Récursion si -r et si c'est un répertoire
+        if (opt_r) {
+            struct stat file_stat;
+            if (stat(filepath, &file_stat) == 0 && S_ISDIR(file_stat.st_mode)) {
+                fsh_for(filepath, cmd, opt_A, opt_r, opt_ext, opt_type);
+            }
+        }
     }
 
-    closedir(dir);
-    //printf("DEBUG: Fin de la boucle 'for' pour le répertoire : %s\n", rep);
     return 0;
 }
 #define MAX_CMD_LENGTH 1024 // Taille maximale de la commande
@@ -67,7 +93,6 @@ int handle_for(char *arg, int *last_return) {
     while (strcmp(opt, "{")!=0 && *opt !='\0'){    
         //printf("opt : |%s|\n",opt);
         if (strcmp(opt, "-A")==0){
-        
             opt_A=1;
         }   
         if (strcmp(opt, "-r")==0){
@@ -111,8 +136,8 @@ int handle_for(char *arg, int *last_return) {
         }*/
         
 
-             // Pour la commande complète
-            strcat(full_command, cmd_start);
+        // Pour la commande complète
+        strcat(full_command, cmd_start);
         //strcat(full_command, " ");
         
 

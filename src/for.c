@@ -77,7 +77,12 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
 
         
     }
+<<<<<<< HEAD
     
+=======
+
+    closedir(dir);
+>>>>>>> a31cca88837f9475f376fdca07d6e23cd8a1c58f
     return last_return;
 }
 #define MAX_CMD_LENGTH 1024 // Taille maximale de la commande

@@ -5,8 +5,9 @@ int fsh_pwd() {
     char cwd[PATH_MAX]; 
 
     // Récupère et affiche le répertoire courant
-    if (getcwd(cwd, sizeof(cwd)) != NULL) { 
-        printf("%s\n", cwd); 
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {  
+        write(1, cwd, strlen(cwd));
+        write(1, "\n", 1);
         return 0;
     } 
 
@@ -80,19 +81,24 @@ int fsh_ftype(const char *path) {
     // Vérifie et affiche le type de fichier
     switch (path_stat.st_mode & S_IFMT) {
         case S_IFREG:
-            printf("regular file\n");
+            write(1,"regular file", 12) ;
+            write(1, "\n", 1);      
             break;
         case S_IFDIR:
-            printf("directory\n");
+            write(1, "directory", 9) ;
+            write(1, "\n", 1);
             break;
         case S_IFLNK:
-            printf("symbolic link\n");
+            write(1, "symbolic link", 13) ;
+            write(1, "\n", 1);
             break;
         case S_IFIFO:
-            printf("named pipe\n");
+            write(1, "named pipe", 10) ;
+            write(1, "\n", 1);
             break;
         default:
-            printf("other\n");
+            write(1, "other", 5);
+            write(1, "\n", 1);
             break;
     }
 
@@ -101,34 +107,44 @@ int fsh_ftype(const char *path) {
 
 
 int handle_interns(char *command, char *arg, int *last_return) {
-    //Gère notre pwd
-    if (strcmp(command, "pwd") == 0) {
-        *last_return = fsh_pwd();
-    }
-    //Gère notre cd
-    else if (strcmp(command, "cd") == 0) {
+    // Vérification supplémentaire pour les arguments multiples
+    if (strcmp(command, "cd") == 0) {
+        if (arg && strtok(NULL, " ") != NULL) { // Plus d'un argument détecté
+            fprintf(stderr, "cd: too many arguments\n");
+            *last_return = 1;
+            return 0;
+        }
         *last_return = fsh_cd(arg);
     }
-    //Gère notre exit
+    else if (strcmp(command, "pwd") == 0) {
+        if (arg) { // pwd ne prend pas d'arguments
+            fprintf(stderr, "pwd: %s: invalid argument\n", arg);
+            *last_return = 1;
+            return 0;
+        }
+        *last_return = fsh_pwd();
+    }
     else if (strcmp(command, "exit") == 0) {
+        if (arg && strtok(NULL, " ") != NULL) { // Plus d'un argument détecté
+            fprintf(stderr, "exit: too many arguments\n");
+            *last_return = 1;
+            return 0;
+        }
         int exit_code = arg ? atoi(arg) : *last_return;
         fsh_exit(exit_code);
-        return -1; // On ne retourne jamais après un exit, mais il est nécessaire de renvoyer un statut
+        return -1; 
     }
-    //Gère notre ftype
     else if (strcmp(command, "ftype") == 0) {
-        if (arg) {
-            *last_return = fsh_ftype(arg);
-        } else {
-            fprintf(stderr, "ftype: argument requis\n");
+        if (!arg || strtok(NULL, " ") != NULL) { // Pas d'argument ou trop d'arguments
+            fprintf(stderr, "ftype: invalid number of arguments\n");
             *last_return = 1;
+            return 0;
         }
+        *last_return = fsh_ftype(arg);
     }
-    
-    // Commande non interne
     else {
-        return 1;
+        return 1; // Commande non interne
     }
-    
-    return 0; // Commande interne traitée avec succès
+
+    return 0;
 }

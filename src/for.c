@@ -5,12 +5,13 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
     //printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]\n, option -t : [%d]\n",opt_A,opt_r,opt_ext,opt_type);
     //printf("après print");
     // Ouverture du répertoire
+    //char *directory;    
     DIR *dir = opendir(rep);
     if (dir == NULL) {
         perror("Erreur lors de l'ouverture du répertoire");
         return 1;
     }
-    //printf("directory : %s",dir);
+
 
     // Parcours des fichiers du répertoire.
     struct dirent *entry;
@@ -24,10 +25,19 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         snprintf(filepath, sizeof(filepath), "%s/%s", rep, entry->d_name);
         //printf("DEBUG: Fichier trouvé : %s\n", filepath);
 
+        char directory[1024];
+        if (realpath(rep, directory) == NULL) {
+            perror("Erreur lors de la résolution du chemin absolu");
+            closedir(dir);
+            return 1;
+        }
+        //printf("DEBUG: Fichier trouvé : %s\n", filepath);
+        //printf("DEBUG: Répertoire : %s\n", directory);
+
         // Exécute la commande pour le fichier courant
         //printf("DEBUG: Exécution de la commande pour le fichier : %s\n", filepath);
         //printf("avant exec commande\n");
-        execute_command(cmd, filepath);
+        execute_command(cmd, filepath,directory);
         //printf("DEBUG: Résultat de la commande pour %s : %d\n", filepath, result);
     }
 

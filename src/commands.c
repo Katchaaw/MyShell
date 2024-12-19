@@ -16,16 +16,16 @@ void get_directory_from_file(const char *file, char *directory) {
     }
 }
 
-int execute_command(const char *cmd, const char *file) {
+int execute_command(const char *cmd, const char *file, const char *directory) {
     //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
 
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
 
-    char directory[1024];  // Pour stocker le répertoire extrait
+    //char directory[1024];  // Pour stocker le répertoire extrait
     
     // Extraire le répertoire à partir du chemin complet du fichier
-    get_directory_from_file(file, directory);
+    //get_directory_from_file(file, directory);
 
     // Remplacement de toutes les occurrences de $F dans la commande par le chemin du fichier.
     char *pos = command;
@@ -56,7 +56,7 @@ int execute_command(const char *cmd, const char *file) {
     while ((pos0 = strstr(pos0, "$D")) != NULL){ 
         // Créer la nouvelle commande avec la substitution
         char new_cmd0[1024];
-        // Copier tout avant $F
+        // Copier tout avant $D
         int len_before0 = pos0 - command;
         snprintf(new_cmd0, len_before0 + 1, "%s", command);
         
@@ -64,7 +64,7 @@ int execute_command(const char *cmd, const char *file) {
             snprintf(new_cmd0 + len_before0, sizeof(new_cmd0) - len_before0, "%s", directory);
       
         // Ajouter la partie après $D
-        snprintf(new_cmd0 + len_before0 + strlen(file), sizeof(new_cmd0) - (len_before0 + strlen(directory)), "%s", pos0 + 2);
+        snprintf(new_cmd0 + len_before0 + strlen(directory), sizeof(new_cmd0) - (len_before0 + strlen(directory)), "%s", pos0 + 2);
 
         // Copier la nouvelle commande dans la variable d'origine
         strncpy(command, new_cmd0, sizeof(command) - 1);

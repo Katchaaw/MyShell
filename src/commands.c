@@ -21,6 +21,40 @@ int maxi (int a, int b){
     }
     return b;
 }
+
+char *args_to_cmd(char **args) {
+    // Vérifier si le tableau est valide
+    if (args == NULL) return NULL;
+
+    // Calculer la taille totale nécessaire pour la chaîne finale
+    size_t total_length = 0;
+    for (int i = 0; args[i] != NULL; i++) {
+        total_length += strlen(args[i])+1;
+    }
+
+    // Allouer la mémoire pour cmd (+1 pour le caractère de fin '\0')
+    char *cmd = malloc(total_length + 1);
+    if (cmd == NULL) {
+        perror("malloc failed");
+        return NULL;
+    }
+
+    // Concaténer les chaînes dans cmd
+    cmd[0] = '\0'; // Initialiser cmd comme une chaîne vide
+    for (int i = 0; args[i] != NULL; i++) {
+        strcat(cmd, args[i]);
+        strcat(cmd, " ");
+    }
+    //printf("cmdd flattenn %s\n",cmd);
+    return cmd; // Retourner la chaîne résultante
+}
+
+
+int execute_from_if(char **args){
+    char *new_cmd = args_to_cmd(args);
+    return execute_command(new_cmd,NULL,NULL);
+}
+
 int execute_command(const char *cmd, const char *file, const char *directory) {
     //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
 
@@ -166,6 +200,15 @@ while ((pos = strchr(pos, '$')) != NULL) {
             free(command_copy);
             return last_return;
         }
+        else if (strcmp(cmd_name, "if") == 0) {
+            //printf("teeeeeeeeeeeeeeest\n");
+            
+            handle_if_else(tokens, &nb_tokens,&last_return);
+            cleanup_tokens(tokens, &nb_tokens); 
+            free(command_copy);
+            return last_return;
+        }
+        
         
         // Commande externe
         int result = execute_external_command(cmd_name, tokens);

@@ -23,7 +23,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
     test_cmd[test_cmd_count] = NULL;
 
     // Exécute le pipeline TEST
-    int test_result = execute_external_command(test_cmd[0], test_cmd);
+    int test_result = execute_from_if(test_cmd);
 
     // Passe au bloc { CMD_1 }
     i++; // Ignore le '{'
@@ -52,7 +52,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
                 // Exécute la commande courante quand on rencontre un point-virgule
                 cmd1[cmd1_count] = NULL;
                 if (cmd1_count > 0) {
-                    *last_return = execute_external_command(cmd1[0], cmd1);
+                    *last_return = execute_from_if(cmd1);
                 }
                 cmd1_count = 0; // Réinitialise pour la prochaine commande
             } else {
@@ -63,7 +63,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
         // Exécute la dernière commande de CMD_1 si elle n'a pas été exécutée
         if (cmd1_count > 0) {
             cmd1[cmd1_count] = NULL;
-            *last_return = execute_external_command(cmd1[0], cmd1);
+            *last_return = execute_from_if(cmd1);
         }
     } else {
         // Recherche du bloc `else { CMD_2 }`, s'il existe
@@ -97,7 +97,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
                     // Exécute la commande courante quand on rencontre un point-virgule
                     cmd2[cmd2_count] = NULL;
                     if (cmd2_count > 0) {
-                        *last_return = execute_external_command(cmd2[0], cmd2);
+                        *last_return = execute_from_if(cmd2);
                     }
                     cmd2_count = 0; // Réinitialise pour la prochaine commande
                 } else {
@@ -108,7 +108,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
             // Exécute la dernière commande de CMD_2 si elle n'a pas été exécutée
             if (cmd2_count > 0) {
                 cmd2[cmd2_count] = NULL;
-                *last_return = execute_external_command(cmd2[0], cmd2);
+                *last_return = execute_from_if(cmd2);
             }
         } else {
             *last_return = 0; // Si pas de `else`, retourne 0

@@ -10,4 +10,6 @@
  */
 int execute_command(const char *cmd, const char *file,const char *directory);
 
+int execute_from_if(char **args);
+
 #endif

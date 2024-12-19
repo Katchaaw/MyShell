@@ -30,18 +30,23 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
         if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL){
         char *cmd1 = strtok(command_cop, ";");
         char *cmd2 = strtok(NULL, "\0");
-        //printf("\ncmd 1 : %s\n",cmd1);
-        //printf("\ncmd 2 : %s\n",cmd2);
-        return execute_command(cmd1, file, directory) + execute_command(cmd2, file, directory);
+
+        
+        //if (strstr(cmd1, "true")){return execute_command(cmd2, file, directory);}
+        //else if (strstr(cmd1, "false")){return 1 + execute_command(cmd2, file, directory);}
+        //else{
+        execute_command(cmd1, file, directory);
+        return execute_command(cmd2, file, directory);
         }
     }
+
+    
 
 
     //char directory[1024];  // Pour stocker le répertoire extrait
     
     // Extraire le répertoire à partir du chemin complet du fichier
     //get_directory_from_file(file, directory);
-    //directory = "caca";
     // Remplacement de toutes les occurrences de $F dans la commande par le chemin du fichier.
     char *pos = command;
 while ((pos = strchr(pos, '$')) != NULL) {

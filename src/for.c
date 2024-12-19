@@ -5,7 +5,8 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
     //printf("\noption -A : [%d]\noption -r : [%d]\noption -e : [%s]\n, option -t : [%d]\n",opt_A,opt_r,opt_ext,opt_type);
     //printf("après print");
     // Ouverture du répertoire
-    //char *directory;    
+    //char *directory;  
+    int last_return=0;  
     DIR *dir = opendir(rep);
     if (dir == NULL) {
         perror("Erreur lors de l'ouverture du répertoire");
@@ -59,7 +60,7 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         }
 
         // Exécuter la commande pour le fichier/répertoire courant
-        execute_command(cmd, filepath, filepath);
+        last_return = execute_command(cmd, filepath, filepath);
 
         // Récursion si -r et si c'est un répertoire
         if (opt_r) {
@@ -70,7 +71,7 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         }
     }
 
-    return 0;
+    return last_return;
 }
 #define MAX_CMD_LENGTH 1024 // Taille maximale de la commande
 

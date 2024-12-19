@@ -56,6 +56,15 @@ int handle_redirections(char **tokens, int *nb_tokens) {
         }
 
         close(fd);
+        // Libère la mémoire des éléments supprimés du tableau
+        if (tokens[i]) {
+            free(tokens[i]);
+            tokens[i] = NULL;
+        }
+        if (tokens[i + 1]) {
+            free(tokens[i + 1]);
+            tokens[i + 1] = NULL;
+        }
 
         // Supprime l'opérateur et le fichier des tokens
         for (int j = i; j + 2 < *nb_tokens; j++) {

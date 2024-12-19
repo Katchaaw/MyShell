@@ -133,7 +133,6 @@ while ((pos = strchr(pos, '$')) != NULL) {
     char *command_copy = strdup(command);
     if (!command_copy) {
         perror("Erreur d'allocation mémoire");
-        free(command_copy);
         return 1;
     }
 

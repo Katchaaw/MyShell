@@ -23,6 +23,9 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
     snprintf(command, sizeof(command), "%s", cmd);
     char *command_cop = strdup(command);
     char *res = command_cop;
+    
+
+
     if ((strstr(res, ";")) != NULL){
         if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL){
         char *cmd1 = strtok(command_cop, ";");
@@ -41,30 +44,36 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
     //directory = "caca";
     // Remplacement de toutes les occurrences de $F dans la commande par le chemin du fichier.
     char *pos = command;
-    while ((pos = strstr(pos, "$F")) != NULL){ 
+while ((pos = strchr(pos, '$')) != NULL) {
+    // Vérifier qu'il y a au moins un caractère après '$'
+    if (*(pos + 1) != '\0') {
         char *test = command;
-        if (strstr(test, "for") == NULL ){
-        // Créer la nouvelle commande avec la substitution
-        char new_cmd[1024];
-        // Copier tout avant $F
-        int len_before = pos - command;
-        snprintf(new_cmd, len_before + 1, "%s", command);
-        
-        // Ajouter le fichier
+        if (strstr(test, "for") == NULL) {
+            // Créer la nouvelle commande avec la substitution
+            char new_cmd[1024];
+            // Copier tout avant le '$'
+            int len_before = pos - command;
+            snprintf(new_cmd, len_before + 1, "%s", command);
+            
+            // Ajouter le fichier (ou autre valeur de substitution)
             snprintf(new_cmd + len_before, sizeof(new_cmd) - len_before, "%s", file);
-      
-        // Ajouter la partie après $F
-        snprintf(new_cmd + len_before + strlen(file), sizeof(new_cmd) - (len_before + strlen(file)), "%s", pos + 2);
-
-        // Copier la nouvelle commande dans la variable d'origine
-        strncpy(command, new_cmd, sizeof(command) - 1);
-        command[sizeof(command) - 1] = '\0';
-
-        // Avancer pour remplacer les autres occurrences
-        pos = command + len_before + strlen(file);
+            
+            // Ajouter la partie après '$X' (où X est le caractère suivant '$')
+            snprintf(new_cmd + len_before + strlen(file), sizeof(new_cmd) - (len_before + strlen(file)), "%s", pos + 2);
+            
+            // Copier la nouvelle commande dans la variable d'origine
+            strncpy(command, new_cmd, sizeof(command) - 1);
+            command[sizeof(command) - 1] = '\0';
+            
+            // Avancer pour remplacer les autres occurrences
+            pos = command + len_before + strlen(file);
+        } else {
+            break;
         }
-        else {break;}
+    } else {
+        break; // Aucun caractère après '$', fin de traitement
     }
+}
 
 
     

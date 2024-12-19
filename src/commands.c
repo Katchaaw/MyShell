@@ -1,5 +1,5 @@
 #include "main.h"
-
+#define MAX_LENGTH 256
 // Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
 int execute_external_command(char *cmd, char **args);
 
@@ -52,10 +52,45 @@ char *args_to_cmd(char **args) {
 
 int execute_from_if(char **args){
     char *new_cmd = args_to_cmd(args);
-    return execute_command(new_cmd,NULL,NULL);
+    return execute_command(new_cmd,NULL,NULL,NULL);
 }
 
-int execute_command(const char *cmd, const char *file, const char *directory) {
+
+void replaceVariable(char *command, char variable, const char *replacement) {
+    char buffer[MAX_LENGTH];
+    char *pos = command;
+    char *match;
+    int replacement_len = strlen(replacement);
+    int variable_len = 2; // Longueur de "$variable" (1 pour '$' + 1 pour la variable)
+
+    buffer[0] = '\0'; // Initialisation du buffer
+
+    while ((match = strstr(pos, "$")) != NULL) {
+        if (*(match + 1) == variable) {
+            // Copie la partie avant "$variable" dans le buffer
+            strncat(buffer, pos, match - pos);
+
+            // Ajoute le remplacement (file)
+            strncat(buffer, replacement, replacement_len);
+
+            // Avance le pointeur après "$variable"
+            pos = match + variable_len;
+        } else {
+            // Si ce n'est pas "$variable", avance le pointeur de 1 caractère
+            strncat(buffer, pos, match - pos + 1);
+            pos = match + 1;
+        }
+    }
+
+    // Copie le reste de la chaîne dans le buffer
+    strncat(buffer, pos, MAX_LENGTH - strlen(buffer) - 1);
+
+    // Remplace le contenu de la chaîne d'origine
+    strncpy(command, buffer, MAX_LENGTH - 1);
+    command[MAX_LENGTH - 1] = '\0'; // Ajoute le terminateur nul
+}
+
+int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
     //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
 
     char command[1024];
@@ -77,14 +112,15 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
         //printf("valMAX :%d\n", maxi(execute_command(cmd1, file, directory),execute_command(cmd2, file, directory)));
         //printf("val2 :%d\n", execute_command(cmd2, file, directory));
         //return maxi(execute_command(cmd1, file, directory),execute_command(cmd2, file, directory));
-        execute_command(cmd1, file, directory);
-        return execute_command(cmd2, file, directory);
+        execute_command(cmd1, file, directory,variable);
+        return execute_command(cmd2, file, directory,variable);
         }
     }
 
-    
-
-
+    if (variable !=NULL){
+        replaceVariable(command,variable,file);
+    }
+/*
     //char directory[1024];  // Pour stocker le répertoire extrait
     
     // Extraire le répertoire à partir du chemin complet du fichier
@@ -150,7 +186,7 @@ while ((pos = strchr(pos, '$')) != NULL) {
         else {
             break;}
     }
-
+    */
 
 
 

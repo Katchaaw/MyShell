@@ -10,6 +10,7 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         perror("Erreur lors de l'ouverture du répertoire");
         return 1;
     }
+    //printf("directory : %s",dir);
 
     // Parcours des fichiers du répertoire.
     struct dirent *entry;
@@ -62,7 +63,7 @@ int handle_for(char *arg, int *last_return) {
         if (strcmp(opt, "-e")==0){
             ext = strtok(NULL, " ");
         }
-        printf("before0");  
+        //printf("before0");  
         if (strcmp(opt, "-t")==0){
             //printf("before");            
             type0 = strtok(NULL, " ");

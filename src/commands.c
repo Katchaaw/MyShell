@@ -3,6 +3,18 @@
 // Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
 int execute_external_command(char *cmd, char **args);
 
+void get_directory_from_file(const char *file, char *directory) {
+    // Copier le chemin complet du fichier dans une nouvelle chaîne pour manipuler
+    strcpy(directory, file);
+    
+    // Trouver le dernier '/' dans le chemin
+    char *last_slash = strrchr(directory, '/');
+    
+    // Si un '/' est trouvé, couper la chaîne avant celui-ci
+    if (last_slash != NULL) {
+        *last_slash = '\0';  // Terminer la chaîne juste avant le dernier '/'
+    }
+}
 
 int execute_command(const char *cmd, const char *file) {
     //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
@@ -10,9 +22,14 @@ int execute_command(const char *cmd, const char *file) {
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
 
+    char directory[1024];  // Pour stocker le répertoire extrait
+    
+    // Extraire le répertoire à partir du chemin complet du fichier
+    get_directory_from_file(file, directory);
+
     // Remplacement de toutes les occurrences de $F dans la commande par le chemin du fichier.
     char *pos = command;
-    while ((pos = strstr(pos, "$F")) != NULL) {
+    while ((pos = strstr(pos, "$F")) != NULL){ 
         // Créer la nouvelle commande avec la substitution
         char new_cmd[1024];
         // Copier tout avant $F
@@ -20,8 +37,8 @@ int execute_command(const char *cmd, const char *file) {
         snprintf(new_cmd, len_before + 1, "%s", command);
         
         // Ajouter le fichier
-        snprintf(new_cmd + len_before, sizeof(new_cmd) - len_before, "%s", file);
-        
+            snprintf(new_cmd + len_before, sizeof(new_cmd) - len_before, "%s", file);
+      
         // Ajouter la partie après $F
         snprintf(new_cmd + len_before + strlen(file), sizeof(new_cmd) - (len_before + strlen(file)), "%s", pos + 2);
 
@@ -32,6 +49,34 @@ int execute_command(const char *cmd, const char *file) {
         // Avancer pour remplacer les autres occurrences
         pos = command + len_before + strlen(file);
     }
+
+
+    
+    char *pos0 = command;
+    while ((pos0 = strstr(pos0, "$D")) != NULL){ 
+        // Créer la nouvelle commande avec la substitution
+        char new_cmd0[1024];
+        // Copier tout avant $F
+        int len_before0 = pos0 - command;
+        snprintf(new_cmd0, len_before0 + 1, "%s", command);
+        
+        // Ajouter le fichier
+            snprintf(new_cmd0 + len_before0, sizeof(new_cmd0) - len_before0, "%s", directory);
+      
+        // Ajouter la partie après $D
+        snprintf(new_cmd0 + len_before0 + strlen(file), sizeof(new_cmd0) - (len_before0 + strlen(directory)), "%s", pos0 + 2);
+
+        // Copier la nouvelle commande dans la variable d'origine
+        strncpy(command, new_cmd0, sizeof(command) - 1);
+        command[sizeof(command) - 1] = '\0';
+
+        // Avancer pour remplacer les autres occurrences
+        pos0 = command + len_before0 + strlen(directory);
+    }
+
+
+
+
 
     //printf("\ncmd : %s ; file : %s \n",cmd,file);
 

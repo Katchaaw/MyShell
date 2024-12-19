@@ -86,7 +86,7 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     free(command_cop);
 
     // Remplacement des variables dans la commande.
-    if (variable !=NULL){
+    if (variable != '\0'){
         replaceVariable(command,variable,file);
     }
 

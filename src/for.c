@@ -78,8 +78,6 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
 
 int handle_for(char *arg, int *last_return) {
     int have_opt = 0;
-    int more_cmd = 0;
-    char *secCommande;
 
     int opt_A = 0; // Option pour inclure les fichiers cachés
     int opt_r = 0; // Option pour activer la récursion

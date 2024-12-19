@@ -37,7 +37,8 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         // Exécute la commande pour le fichier courant
         //printf("DEBUG: Exécution de la commande pour le fichier : %s\n", filepath);
         //printf("avant exec commande\n");
-        execute_command(cmd, filepath,directory);
+        //printf("DEBUG: Début de la boucle 'for' avec répertoire : |%s| et commande : |%s|\n", rep, cmd);
+        execute_command(cmd, filepath,filepath);
         //printf("DEBUG: Résultat de la commande pour %s : %d\n", filepath, result);
     }
 
@@ -50,6 +51,8 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
 int handle_for(char *arg, int *last_return) {
     //printf("debut for ------------------------\n");
     int have_opt = 0;
+    int more_cmd = 0;
+    char *secCommande;
     int opt_A =0;
     int opt_r =0;
     char *ext = "";
@@ -94,12 +97,29 @@ int handle_for(char *arg, int *last_return) {
         if (have_opt){
             cmd_start++;
         }
-        //printf("cmd_start : %s\n",cmd_start);
+        char full_command[MAX_CMD_LENGTH] = {0};
 
-        char full_command[MAX_CMD_LENGTH] = {0}; // Pour la commande complète
-        strcat(full_command, cmd_start);
+        
+    
+        //char *pos = cmd_start;
+        //printf("-dz-d-zd--ze-d-ze-%s\n",pos);
+        /*if ((pos = strstr(pos, ";")) != NULL){
+            //printf("-dz-d-aaaaazd--ze-d-ze-\n");
+            more_cmd = 1;
+            secCommande = strtok(cmd_start,";");
+            cmd_start = strtok(NULL, "}");
+        }*/
+        
+
+             // Pour la commande complète
+            strcat(full_command, cmd_start);
         //strcat(full_command, " ");
+        
 
+        //printf("deuxième : %s\n",secCommande);
+        //printf("cmd_start : %s\n",cmd_start);
+        
+        
         char *segment = strtok(NULL, "}");       // Premier segment jusqu'à '}'
 
         while (segment != NULL) {
@@ -123,6 +143,10 @@ int handle_for(char *arg, int *last_return) {
         if (strlen(var) == 1) {
             //strcat(full_command, "\0");
             //printf("fin handle\n");
+            //if (more_cmd){
+              //  *last_return = fsh_for(rep, secCommande,opt_A,opt_r,ext,*type0);            
+            //}
+
             *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext,*type0);
         } else {
             fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");

@@ -15,7 +15,12 @@ void get_directory_from_file(const char *file, char *directory) {
         *last_slash = '\0';  // Terminer la chaîne juste avant le dernier '/'
     }
 }
-
+int maxi (int a, int b){
+    if (a> b){
+        return a;
+    }
+    return b;
+}
 int execute_command(const char *cmd, const char *file, const char *directory) {
     //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
 
@@ -35,6 +40,9 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
         //if (strstr(cmd1, "true")){return execute_command(cmd2, file, directory);}
         //else if (strstr(cmd1, "false")){return 1 + execute_command(cmd2, file, directory);}
         //else{
+        //printf("valMAX :%d\n", maxi(execute_command(cmd1, file, directory),execute_command(cmd2, file, directory)));
+        //printf("val2 :%d\n", execute_command(cmd2, file, directory));
+        //return maxi(execute_command(cmd1, file, directory),execute_command(cmd2, file, directory));
         execute_command(cmd1, file, directory);
         return execute_command(cmd2, file, directory);
         }

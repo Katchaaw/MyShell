@@ -60,7 +60,8 @@ int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *op
         }
 
         // Exécuter la commande pour le fichier/répertoire courant
-        last_return = execute_command(cmd, filepath, filepath);
+        int last_returnTemp = execute_command(cmd, filepath, filepath);
+        if (last_returnTemp> last_return){last_return = last_returnTemp;}
 
         // Récursion si -r et si c'est un répertoire
         if (opt_r) {

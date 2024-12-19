@@ -24,11 +24,13 @@ int execute_command(const char *cmd, const char *file, const char *directory) {
     char *command_cop = strdup(command);
     char *res = command_cop;
     if ((strstr(res, ";")) != NULL){
+        if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL){
         char *cmd1 = strtok(command_cop, ";");
         char *cmd2 = strtok(NULL, "\0");
         //printf("\ncmd 1 : %s\n",cmd1);
         //printf("\ncmd 2 : %s\n",cmd2);
         return execute_command(cmd1, file, directory) + execute_command(cmd2, file, directory);
+        }
     }
 
 

@@ -170,8 +170,7 @@ int handle_for(char *arg, int *last_return) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
         char *verifAc = cmd_start;
         int multiAc = 0;
-
-        if (strstr(verifAc,"{") && strstr(verifAc,"if [")){
+        if (strstr(verifAc,"{") && (strstr(verifAc,"if [") || strstr(verifAc,"; if"))){
             multiAc = 1;
         }
         

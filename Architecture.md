@@ -43,8 +43,8 @@ La structure du projet peut être vue comme une **pyramide**. On a un fichier `m
     Gère les pipelines permettant de chaîner plusieurs commandes via le caractère '|'.
 
 
-### Diagramme UML
-*[ Voir Diagramme_de_classes.pdf ]*
+### Diagramme de classe
+[Diagramme de classe](Architecture_de_classes.pdf)
 
 
 ## 2. Structures de données

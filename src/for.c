@@ -1,4 +1,6 @@
 #include "for.h"
+#include "if.h"
+#include "commands.h"
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
@@ -8,8 +10,6 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "if.h"
-#include "commands.h"
 
 
 int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *opt_ext, char opt_type, char variable, int opt_p, int max_p) { 

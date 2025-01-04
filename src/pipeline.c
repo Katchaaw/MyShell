@@ -1,4 +1,5 @@
-#include "main.h"
+#include "pipeline.h"
+#include "redirections.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>

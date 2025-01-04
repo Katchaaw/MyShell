@@ -6,7 +6,6 @@
 #include <math.h>
 #include <limits.h>
 #include "externs.h"
-#include "interns.h"
 
 
 

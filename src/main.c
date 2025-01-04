@@ -54,7 +54,6 @@ int main() {
             continue;
         }
 
-        //printf("\nline : %s\n",copy_line);
         if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
             execute_command(copy_line,NULL,NULL,'a');
             continue;

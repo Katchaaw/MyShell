@@ -22,6 +22,10 @@ int handle_pipe(char **tokens) {
     commands[cmd_count][arg_index] = NULL; // Terminer la dernière commande
     cmd_count++;
 
+    // Sauvegarder les descripteurs d'entrée/sortie originaux
+    int originalInput = dup(STDIN_FILENO);
+    int originalOutput = dup(STDOUT_FILENO);
+
     // Créer les pipes nécessaires
     for (int i = 0; i < cmd_count - 1; i++) {
         if (pipe(pipes[i]) == -1) {
@@ -39,32 +43,37 @@ int handle_pipe(char **tokens) {
         } else if (pid == 0) {
             // Dans le processus fils
 
-            // Calculer le nombre de tokens pour la commande courante
+            // Redirection de l'entrée si ce n'est pas la première commande
+            if (i > 0) {
+                if (dup2(pipes[i - 1][0], STDIN_FILENO) == -1) {
+                    perror("dup2 pour l'entrée");
+                    exit(1);
+                }
+            }
+
+            // Redirection de la sortie si ce n'est pas la dernière commande
+            if (i < cmd_count - 1) {
+                if (dup2(pipes[i][1], STDOUT_FILENO) == -1) {
+                    perror("dup2 pour la sortie");
+                    exit(1);
+                }
+            }
+
+            // Fermer tous les descripteurs de pipe inutilisés
+            for (int j = 0; j < cmd_count - 1; j++) {
+                close(pipes[j][0]);
+                close(pipes[j][1]);
+            }
+
+            // Gérer les redirections
             int num_tokens = 0;
             while (commands[i][num_tokens] != NULL) {
                 num_tokens++;
             }
 
-            // Rediriger l'entrée standard si nécessaire (après les redirections)
-            if (i > 0) {  // Ce n'est pas la première commande
-                if (dup2(pipes[i - 1][0], STDIN_FILENO) == -1) {
-                    perror("dup2 pour l'entrée");
-                    return 1;
-                }
-            }
-
-            // Rediriger la sortie standard si nécessaire (après les redirections)
-            if (i < cmd_count - 1) {  // Ce n'est pas la dernière commande
-                if (dup2(pipes[i][1], STDOUT_FILENO) == -1) {
-                    perror("dup2 pour la sortie");
-                    return 1;
-                }
-            }
-
-            // Fermer tous les descripteurs de pipe
-            for (int j = 0; j < cmd_count - 1; j++) {
-                close(pipes[j][0]);
-                close(pipes[j][1]);
+            if (handle_redirections(commands[i], &num_tokens) != 0) {
+                perror("Erreur lors des redirections");
+                return 1;
             }
 
             // Exécuter la commande
@@ -85,6 +94,13 @@ int handle_pipe(char **tokens) {
     for (int i = 0; i < cmd_count; i++) {
         wait(NULL);
     }
+
+    // Restaurer les descripteurs d'entrée/sortie originaux
+    if (dup2(originalInput, STDIN_FILENO) == -1 || dup2(originalOutput, STDOUT_FILENO) == -1) {
+        perror("Erreur lors de la restauration des descripteurs d'origine");
+    }
+    close(originalInput);
+    close(originalOutput);
 
     return 0;
 }

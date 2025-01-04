@@ -25,8 +25,8 @@ int fsh_pwd() {
 
 int fsh_cd(const char *path) {
     static char previous_dir[PATH_MAX]; // Stocke le répertoire précédent
-    char current_dir[PATH_MAX]; // Buffer pour le répertoire courant
-    const char *home = getenv("HOME"); // Récupère $HOME
+    char current_dir[PATH_MAX];         // Buffer pour le répertoire courant
+    const char *home = getenv("HOME");  // Récupère $HOME
 
     // Récupère le répertoire courant
     if (getcwd(current_dir, sizeof(current_dir)) == NULL) {

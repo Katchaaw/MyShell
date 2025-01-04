@@ -14,12 +14,12 @@
 
 
 int main() {
-    char *line; // Ligne lue depuis l'entrée utilisateur
-    int last_return = 0; // Code de retour de la dernière commande
+    char *line;                // Ligne lue depuis l'entrée utilisateur
+    int last_return = 0;       // Code de retour de la dernière commande
     char *tokens[MAX_TOKENS];  // Tableau pour stocker les tokens
-    int nb_tokens = 0;  // Nombre de tokens extraits
+    int nb_tokens = 0;         // Nombre de tokens extraits
 
-    rl_outstream = stderr; // Redirige la sortie de readline vers stderr
+    rl_outstream = stderr;     // Redirige la sortie de readline vers stderr
 
     save_redirections();
 

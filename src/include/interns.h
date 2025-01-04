@@ -1,9 +1,6 @@
 #ifndef INTERNS_H
 #define INTERNS_H
 
-// Définition de la longueur maximale du chemin.
-#define PATH_MAX 4096
-
 /**
  * Affiche le répertoire de travail courant.
  *

@@ -9,10 +9,8 @@
 #include "if.h"
 #include "for.h"
 #include "interns.h"
+#include "externs.h"
 
-
-// Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
-int execute_external_command(char *cmd, char **args);
 
 char *args_to_cmd(char **args) {
     if (args == NULL) return NULL;

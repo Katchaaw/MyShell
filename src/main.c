@@ -41,6 +41,12 @@ int main() {
             continue;
         }
 
+        //printf("\nline : %s\n",copy_line);
+        if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
+            execute_command(copy_line,NULL,NULL,NULL);
+            continue;
+        }
+
         // Tokenisation de la ligne
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);

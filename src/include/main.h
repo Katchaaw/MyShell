@@ -26,5 +26,6 @@
 #include "redirections.h"
 #include "for.h"
 #include "if.h"
+#include "pipeline.h"
 
 #endif

@@ -45,8 +45,12 @@ int main() {
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
 
-        // Appel à la gestion des redirections
-        if (handle_redirections(tokens, &nb_tokens) == 1) {
+        if (check_pipe(tokens) == 1) {
+            if (handle_pipe(tokens) == 0) {
+                free(line);
+                continue;
+            }
+        } else if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
             continue;

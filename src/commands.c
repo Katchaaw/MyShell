@@ -9,6 +9,7 @@
 #include "if.h"
 #include "for.h"
 #include "interns.h"
+#include "externs.h"
 
 
 // Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
@@ -89,9 +90,11 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
 
         //printf("cmd 1 : %s ; cmd2 : %s",cmd1,cmd2);
 
-        execute_command(cmd1, file, directory, variable);
-        int result = execute_command(cmd2, file, directory, variable);
-        //printf("\nresult : %d\n",result);
+        int result = execute_command(cmd1, file, directory, variable);
+        if (last_was_signal !=2){
+            result = execute_command(cmd2, file, directory, variable);
+        }
+        //printf("\ncmd : %s , result : %d\n",cmd,result);
         free(command_cop);
     
         return result;

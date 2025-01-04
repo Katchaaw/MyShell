@@ -13,7 +13,7 @@
 
 int get_fixed_prompt_length(int last_return) {
     int len = 3;  // Longueur de base pour les crochets et "$ ".
-    
+    //printf("last return : %d\n", last_return);
     if (last_return == 0) {
         len += 1;  // "0" occupe un unique caractère.
     } else {
@@ -47,9 +47,14 @@ char* generate_prompt(int last_return) {
     // Calculer dynamiquement la longueur pour la partie "[last_return]$ ".
     int fixed_prompt_len = get_fixed_prompt_length(last_return);
 
+    //printf("taille : %d\n",fixed_prompt_len);
+    //printf("taille2 : %d\n",PROMPT_TOTAL_LENGTH - fixed_prompt_len);  
+    //if (PROMPT_TOTAL_LENGTH - fixed_prompt_len == 23) fixed_prompt_len+=2;
+
     // Récupère le répertoire courant
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
         // Tronque le chemin pour respecter la taille maximale
+        
         truncate_path(cwd, truncated_cwd, PROMPT_TOTAL_LENGTH - fixed_prompt_len);  // Utiliser la longueur dynamique
     } 
     
@@ -59,8 +64,8 @@ char* generate_prompt(int last_return) {
         strcpy(truncated_cwd, "?");
     }
 
-    if (last_was_signal) {
-         snprintf(prompt, sizeof(prompt), "\001\033[91m\002[SIG] \001\033[34m\002%s$ \001\033[36m\002", truncated_cwd);
+    if (last_was_signal>0) {
+         snprintf(prompt, sizeof(prompt), "\001\033[91m\002[SIG]\001\033[34m\002%s$ \001\033[36m\002", truncated_cwd);
     } 
     else {
         snprintf(prompt, sizeof(prompt), "\001\033[%sm\002[%d]\001\033[00m\002\001\033[34m\002%s$ \001\033[36m\002",

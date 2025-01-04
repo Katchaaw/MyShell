@@ -46,7 +46,7 @@ int handle_redirections(char **tokens, int *nb_tokens) {
 
         // Vérifie qu'un fichier suit l'opérateur
         if (i + 1 >= *nb_tokens) {
-            fprintf(stderr, "Erreur: fichier manquant après l'opérateur %s\n", tokens[i]);
+            perror("Erreur: fichier manquant après l'opérateur\n");
             return 1;
         }
 

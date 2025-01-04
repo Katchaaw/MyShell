@@ -9,8 +9,6 @@
 #include "interns.h"
 
 
-
-
 int get_fixed_prompt_length(int last_return) {
     int len = 3;  // Longueur de base pour les crochets et "$ ".
     
@@ -40,8 +38,8 @@ void truncate_path(const char *path, char *truncated_path, size_t max_length) {
 
 
 char* generate_prompt(int last_return) {
-    static char prompt[PROMPT_BUFFER_SIZE]; //Buffer statiue pour le prompt
-    char cwd[PATH_MAX]; // Buffer pour le répertoire courant.
+    static char prompt[PROMPT_BUFFER_SIZE]; // Buffer statiue pour le prompt
+    char cwd[PATH_MAX];                     // Buffer pour le répertoire courant.
     char truncated_cwd[PROMPT_TOTAL_LENGTH + 1];  // Buffer pour le chemin tronqué.
 
     // Calculer dynamiquement la longueur pour la partie "[last_return]$ ".
@@ -51,10 +49,8 @@ char* generate_prompt(int last_return) {
     if (getcwd(cwd, sizeof(cwd)) != NULL) {
         // Tronque le chemin pour respecter la taille maximale
         truncate_path(cwd, truncated_cwd, PROMPT_TOTAL_LENGTH - fixed_prompt_len);  // Utiliser la longueur dynamique
-    } 
-    
-    // Erreur de récupération du répertoire courant
-    else {
+    } else {
+        // Erreur de récupération du répertoire courant
         perror("Erreur getcwd");
         strcpy(truncated_cwd, "?");
     }
@@ -68,8 +64,6 @@ char* generate_prompt(int last_return) {
                 last_return,
                 truncated_cwd);
     }
-
-
 
     return prompt;
 }

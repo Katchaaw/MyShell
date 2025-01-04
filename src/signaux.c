@@ -6,12 +6,12 @@
 
 
 volatile sig_atomic_t was_interrupted = 0; // Signal qui a interrompu la commande
-volatile sig_atomic_t last_signal = 0;    // Stocke le dernier signal reçu
+volatile sig_atomic_t last_signal = 0;     // Stocke le dernier signal reçu
 
 // Gestionnaire de signal personnalisé
 void handle_signal(int signal) {
     if (signal == SIGINT || signal == SIGTERM) {
-        was_interrupted = 1;   // Indique qu'une interruption a eu lieu
+        was_interrupted = 1;  // Indique qu'une interruption a eu lieu
         last_signal = signal; // Stocke le signal reçu
     }
 }

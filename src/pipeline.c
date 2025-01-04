@@ -10,8 +10,8 @@
 #define MAX_ARGS 100
 
 int handle_pipe(char **tokens) {
-    int pipes[MAX_CMDS - 1][2]; // Tableau pour stocker les pipes
-    int cmd_count = 0;          // Compteur de commandes
+    int pipes[MAX_CMDS - 1][2];         // Tableau pour stocker les pipes
+    int cmd_count = 0;                  // Compteur de commandes
     char *commands[MAX_CMDS][MAX_ARGS]; // Commandes séparées en tokens
 
     int arg_index = 0;

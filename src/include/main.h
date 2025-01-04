@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-// Modules internes.
+// Modules internes
 #include "interns.h"
 #include "externs.h"
 #include "tokenizer.h"

@@ -35,6 +35,7 @@ int execute_external_command(char *cmd, char **args) {
 
         // Retourne la valeur de sortie du processus fils
         if (WIFSIGNALED(status)) {
+            //printf("type de signale : %d\n",WTERMSIG(status));
             last_was_signal = 1;
             return 255; // Valeur de retour définie dans l'énoncé
         } 

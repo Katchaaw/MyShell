@@ -43,8 +43,12 @@ int main() {
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
 
-        // Appel à la gestion des redirections
-        if (handle_redirections(tokens, &nb_tokens) == 1) {
+        if (check_pipe(tokens) == 1) {
+            if (handle_pipe(tokens) == 0) {
+                free(line);
+                continue;
+            }
+        } else if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
             continue;
@@ -57,13 +61,6 @@ int main() {
                 strcat(line, " ");  // Ajoute un espace entre les tokens
             }
             strcat(line, tokens[i]);  // Concatène chaque token à 'line'
-        }
-
-        if (check_pipe(tokens) == 1) {
-            if (handle_pipe(tokens) == 0) {
-                free(line);
-                continue;
-            }
         }
 
         if (strcmp(tokens[0], "if") == 0) {

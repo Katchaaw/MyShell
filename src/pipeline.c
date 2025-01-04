@@ -22,9 +22,7 @@ int handle_pipe(char **tokens) {
     commands[cmd_count][arg_index] = NULL; // Terminer la dernière commande
     cmd_count++;
 
-    // Sauvegarder les descripteurs d'entrée/sortie originaux
-    int originalInput = dup(STDIN_FILENO);
-    int originalOutput = dup(STDOUT_FILENO);
+    save_redirections();
 
     // Créer les pipes nécessaires
     for (int i = 0; i < cmd_count - 1; i++) {
@@ -81,6 +79,7 @@ int handle_pipe(char **tokens) {
                 perror("execvp");
                 return 1;
             }
+            reset_redirections();
         }
     }
 
@@ -94,13 +93,6 @@ int handle_pipe(char **tokens) {
     for (int i = 0; i < cmd_count; i++) {
         wait(NULL);
     }
-
-    // Restaurer les descripteurs d'entrée/sortie originaux
-    if (dup2(originalInput, STDIN_FILENO) == -1 || dup2(originalOutput, STDOUT_FILENO) == -1) {
-        perror("Erreur lors de la restauration des descripteurs d'origine");
-    }
-    close(originalInput);
-    close(originalOutput);
 
     return 0;
 }

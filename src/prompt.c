@@ -49,12 +49,16 @@ char* generate_prompt(int last_return) {
         strcpy(truncated_cwd, "?");
     }
 
-    // Formate le prompt avec les codes couleur.
-    snprintf(prompt, sizeof(prompt),
-             "\001\033[%sm\002[%d]\001\033[00m\002\001\033[34m\002%s$ \001\033[36m\002",
-             last_return == 0 ? "32" : "91", 
-             last_return, 
-             truncated_cwd);
+    if (last_was_signal) {
+         snprintf(prompt, sizeof(prompt), "\001\033[91m\002[SIG] \001\033[34m\002%s$ \001\033[36m\002", truncated_cwd);
+    } 
+    else {
+        snprintf(prompt, sizeof(prompt), "\001\033[%sm\002[%d]\001\033[00m\002\001\033[34m\002%s$ \001\033[36m\002",
+                last_return == 0 ? "32" : "91",
+                last_return,
+                truncated_cwd);
+    }
+
 
 
     return prompt;

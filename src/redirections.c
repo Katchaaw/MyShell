@@ -1,4 +1,12 @@
-#include "main.h"
+#include "redirections.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 
 static int saved_stdin, saved_stdout, saved_stderr;
 

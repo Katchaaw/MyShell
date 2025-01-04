@@ -1,4 +1,10 @@
 #include "main.h"
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <sys/wait.h>
 
 #define MAX_CMDS 100
 #define MAX_ARGS 100

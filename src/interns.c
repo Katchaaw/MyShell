@@ -1,4 +1,12 @@
-#include "main.h"
+#include "interns.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <limits.h>
+
+
 
 int fsh_pwd() {
     // Buffer pour stocker le chemin du répertoire courant

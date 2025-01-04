@@ -1,4 +1,17 @@
 #include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <stddef.h>
+
 
 int main() {
     char *line; // Ligne lue depuis l'entrée utilisateur
@@ -43,7 +56,7 @@ int main() {
 
         //printf("\nline : %s\n",copy_line);
         if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
-            execute_command(copy_line,NULL,NULL,NULL);
+            execute_command(copy_line,NULL,NULL,'a');
             continue;
         }
 

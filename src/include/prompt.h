@@ -7,6 +7,8 @@
 // Taille du buffer pour le prompt, plus large pour inclure les codes couleur.
 #define PROMPT_BUFFER_SIZE 64
 
+#include <stddef.h>
+
 /**
  * Tronque un chemin pour qu'il ne dépasse pas une longueur maximale spécifiée.
  *

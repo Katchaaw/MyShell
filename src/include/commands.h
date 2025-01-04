@@ -1,6 +1,8 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#define MAX_LENGTH 256
+
 /**
  * Exécute une commande après avoir remplacé la variable une variable (par exemple `$F`) par une valeur donnée.
  *

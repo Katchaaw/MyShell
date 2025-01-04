@@ -6,8 +6,12 @@
 // Variable globale pour indiquer le signal qui a interrompu la commande précédente
 extern volatile sig_atomic_t was_interrupted;
 
-void setup_signals_handlers(void);
+void handle_signal(int signal);
 
-void restore_default_signals(void);
+void setup_signals();
+
+void restore_default_signals();
+
+const char* get_signal_name(int signal);
 
 #endif // SIGNAUX_H

@@ -1,4 +1,8 @@
-#include "main.h"
+#include "tokenizer.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 int tokenizer(char *line, char *tokens[], int *nb_tokens, const char *delimiter) {
     char *token;

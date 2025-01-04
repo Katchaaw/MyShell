@@ -1,5 +1,15 @@
-#include "main.h"
-#define MAX_LENGTH 256
+#include "commands.h"
+#include <stdio.h>     
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include "tokenizer.h"
+#include "if.h"
+#include "for.h"
+#include "interns.h"
+
 
 // Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
 int execute_external_command(char *cmd, char **args);

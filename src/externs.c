@@ -1,4 +1,11 @@
-#include "main.h"
+#include "externs.h"
+#include <stdio.h> 
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include "signaux.h"
+
 
 int last_was_signal = 0;
 

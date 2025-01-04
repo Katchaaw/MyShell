@@ -1,4 +1,14 @@
-#include "main.h"
+#include "prompt.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <math.h>
+#include <limits.h>
+#include "externs.h"
+#include "interns.h"
+
+
 
 
 int get_fixed_prompt_length(int last_return) {

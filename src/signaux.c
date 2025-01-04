@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
+
 
 volatile sig_atomic_t was_interrupted = 0; // Signal qui a interrompu la commande
 volatile sig_atomic_t last_signal = 0;    // Stocke le dernier signal reçu

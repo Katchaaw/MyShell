@@ -1,4 +1,11 @@
-#include "main.h"
+#include "if.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include "tokenizer.h"
+#include "commands.h"
+
 
 int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
     // Vérifie que la commande commence par "if"

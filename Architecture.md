@@ -215,7 +215,7 @@ Algorithme :
     3. Exécuter chaque commande et fermer les descripteurs inutilisés.
 
 #### 3.11. Gestions des commandes multiples
-Description :
+- Description :
     Une commande composée de plusieurs sous-commandes separées par `;` est décomposée et exécutée de manière séquentielle.
 Algorithme :
 
@@ -233,4 +233,6 @@ Algorithme :
 
     2. Appliquer les algorithmes appropriés à chaque sous-partie.
 
-    3. Combiner les résultats pour produire l'exécution finale
+    3. Combiner les résultats pour produire l'exécution finale - 
+
+    4. La valeur de retour sera toujours la valeur de retour de la dernière exécution concluante. Cela permet de garder un résultat cohérent si jamais on a SIGINT.

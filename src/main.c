@@ -14,12 +14,12 @@
 
 
 int main() {
-    char *line; // Ligne lue depuis l'entrée utilisateur
-    int last_return = 0; // Code de retour de la dernière commande
+    char *line;                // Ligne lue depuis l'entrée utilisateur
+    int last_return = 0;       // Code de retour de la dernière commande
     char *tokens[MAX_TOKENS];  // Tableau pour stocker les tokens
-    int nb_tokens = 0;  // Nombre de tokens extraits
+    int nb_tokens = 0;         // Nombre de tokens extraits
 
-    rl_outstream = stderr; // Redirige la sortie de readline vers stderr
+    rl_outstream = stderr;     // Redirige la sortie de readline vers stderr
 
     save_redirections();
 
@@ -54,7 +54,6 @@ int main() {
             continue;
         }
 
-        //printf("\nline : %s\n",copy_line);
         if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
             last_return = execute_command(copy_line,NULL,NULL,'a');
             continue;

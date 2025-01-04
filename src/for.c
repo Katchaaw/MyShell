@@ -1,4 +1,6 @@
 #include "for.h"
+#include "if.h"
+#include "commands.h"
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h>
@@ -8,14 +10,12 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
-#include "if.h"
-#include "commands.h"
 
 
 int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *opt_ext, char opt_type, char variable, int opt_p, int max_p) { 
     int last_return = 0;  
     int active_processes = 0; // Nombre de processus actifs
-    //printf("\n cmd from for : %s\n",cmd);
+    
     // Ouverture du répertoire
     DIR *dir = opendir(rep);
     if (dir == NULL) {
@@ -80,45 +80,44 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
 
         // Gestion de l'option -p (traitement parallèle)
         if (opt_p) {
-            //printf("val max : %d\n", max_p);
             // Attendre si le nombre de processus actifs atteint max_p
             while (active_processes >= max_p) {
-                    int status;
-                    pid_t child_pid = wait(&status); // Attendre qu'un processus enfant se termine
-                    active_processes--;
+                int status;
+                wait(&status);
+                active_processes--;
 
-                    // Récupérer la valeur de retour du processus enfant
-                    if (WIFEXITED(status)) {
-                        int child_return = WEXITSTATUS(status);
-                        if (child_return > last_return) {
-                            last_return = child_return;
-                        }
-                    } else {
-                        fprintf(stderr, "Un processus enfant (%d) s'est terminé anormalement.\n", child_pid);
+                // Récupérer la valeur de retour du processus enfant
+                if (WIFEXITED(status)) {
+                    int child_return = WEXITSTATUS(status);
+                    if (child_return > last_return) {
+                        last_return = child_return;
                     }
+                } else {
+                   perror("Un processus enfant s'est terminé anormalement.\n");
                 }
+            }
 
-                pid_t pid = fork();
-                if (pid == 0) {
-                    // Processus enfant
-                    exit(execute_command(cmd, filepath, filepath, variable));
-                } else if (pid > 0) {
-                // Processus parent
-                active_processes++;
-                } else {
-                    perror("Erreur lors de la création du processus");
-                    closedir(dir);
-                    return 1;
-                }
-                } else {
-                    // Exécution séquentielle si -p n'est pas activé
-                    int last_returnTemp = execute_command(cmd, filepath, filepath, variable);
-                    if (last_returnTemp > last_return) {
-                        last_return = last_returnTemp;
-                    }
-                }
+            pid_t pid = fork();
+            if (pid == 0) {
+                // Processus enfant
+                exit(execute_command(cmd, filepath, filepath, variable));
+            } else if (pid > 0) {
+            // Processus parent
+            active_processes++;
+            } else {
+                perror("Erreur lors de la création du processus");
+                closedir(dir);
+                return 1;
+           }
+        } else {
+
+            // Exécution séquentielle si -p n'est pas activé
+            int last_returnTemp = execute_command(cmd, filepath, filepath, variable);
+            if (last_returnTemp > last_return) {
+                last_return = last_returnTemp;
+            }
         }
-
+    }
 
     // Attendre la fin de tous les processus enfants
     while (active_processes > 0) {
@@ -135,9 +134,9 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
 int handle_for(char *arg, int *last_return) {
     int have_opt = 0;
 
-    int opt_A = 0; // Option pour inclure les fichiers cachés
-    int opt_r = 0; // Option pour activer la récursion
-    char *ext = ""; // Extension à filtrer
+    int opt_A = 0;    // Option pour inclure les fichiers cachés
+    int opt_r = 0;    // Option pour activer la récursion
+    char *ext = "";   // Extension à filtrer
     char *type0 = ""; // Type de fichier à filtrer
     int opt_p = 0;
     int max_p =0;
@@ -173,14 +172,14 @@ int handle_for(char *arg, int *last_return) {
         int multiAc = 0;
         if (strstr(verifAc,"{") && (strstr(verifAc,"if [") || strstr(verifAc,"; if"))){
             multiAc = 1;
-            
         }
         
         if (cmd_start == NULL) {
-            fprintf(stderr, "Erreur: '{' manquant\n");
+            perror("Erreur: '{' manquant\n");
             *last_return = 1;
             return 1;
         }
+
         if (have_opt){
             cmd_start++;
         }
@@ -188,6 +187,7 @@ int handle_for(char *arg, int *last_return) {
         //Construire la commande complète.
         char full_command[MAX_CMD_LENGTH] = {0};
         strcat(full_command, cmd_start);
+
         if (multiAc){
             strcat(full_command, "}");
         }
@@ -197,30 +197,23 @@ int handle_for(char *arg, int *last_return) {
         while (segment != NULL) {
             // Ajouter le segment à la commande complète avec un espace
             
-            //printf("segment : %s\n",segment);
             if (strstr(segment,";") && !strstr(segment,"}")){
                 segment+=2;
-                //segment = strtok(NULL,";");
                 char *cmd2 = strdup(segment);
-                //printf("in if segment : %s\n",segment);
                 *last_return = execute_command(cmd2, NULL, NULL, 'A');
                 segment = NULL;
-            }
+            } 
             else {
-            // Vérifier s'il reste quelque chose après '}'
-            strcat(full_command, segment);
-            strcat(full_command, "}");
-            segment++;
-            segment = strtok(NULL, "}"); // Chercher le prochain segment
+                // Vérifier s'il reste quelque chose après '}'
+                strcat(full_command, segment);
+                strcat(full_command, "}");
+                segment++;
+                segment = strtok(NULL, "}"); // Chercher le prochain segment
             }
         }
         
-            char *cmd_final = full_command;
-        //strcat(cmd_final, "}");
-        //printf("cmd_final : %s\n", cmd_final);
-
+        char *cmd_final = full_command;
         // Nettoyer la commande finale (supprimer les espaces inutiles)
-        
         while (*cmd_final == ' ' || *cmd_final == '\t') {
             cmd_final++;
         }
@@ -230,12 +223,12 @@ int handle_for(char *arg, int *last_return) {
             *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext,*type0,*arg,opt_p,max_p);
         } 
         else {
-            fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
+            perror("Syntaxe incorrecte: for F in REP { CMD }\n");
             *last_return = 1;
         }
-    } 
-    else {
-        fprintf(stderr, "Erreur: syntaxe incorrecte, la commande doit être : for F in REP { CMD }\n");
+        
+    } else {
+        perror("Erreur: syntaxe incorrecte, la commande doit être : for F in REP { CMD }\n");
         *last_return = 1;
     }
 

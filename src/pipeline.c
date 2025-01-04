@@ -1,4 +1,5 @@
-#include "main.h"
+#include "pipeline.h"
+#include "redirections.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
@@ -10,8 +11,8 @@
 #define MAX_ARGS 100
 
 int handle_pipe(char **tokens) {
-    int pipes[MAX_CMDS - 1][2]; // Tableau pour stocker les pipes
-    int cmd_count = 0;          // Compteur de commandes
+    int pipes[MAX_CMDS - 1][2];         // Tableau pour stocker les pipes
+    int cmd_count = 0;                  // Compteur de commandes
     char *commands[MAX_CMDS][MAX_ARGS]; // Commandes séparées en tokens
 
     int arg_index = 0;
@@ -113,13 +114,13 @@ int check_pipe(char **tokens) {
         if (strcmp(tokens[i], "|") == 0) {
             // Vérifier que ce n'est pas le premier ou le dernier élément
             if (i == 0 || tokens[i + 1] == NULL) {
-                fprintf(stderr, "Erreur : pipe en début ou fin de commande\n");
+                perror("Erreur : pipe en début ou fin de commande\n");
                 return 0; // Erreur, pipe en début ou fin
             }
 
             // Vérifier qu'il n'y a pas de pipes successifs
             if (is_previous_pipe) {
-                fprintf(stderr, "Erreur : pipe successif trouvé\n");
+                perror("Erreur : pipe successif trouvé\n");
                 return 0; // Erreur, deux pipes successifs
             }
 

@@ -14,7 +14,7 @@
 
  * @return Le code de retour le plus élevé parmi toutes les commandes exécutées, ou 1 en cas d'erreur.
  */
-int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext,char opt_type,char variable);
+int fsh_for(const char *rep, const char *cmd,int opt_A, int opt_r,const char *opt_ext,char opt_type,char variable,int opt_p,int max_p);
 
 
 /**

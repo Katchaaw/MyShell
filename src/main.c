@@ -10,6 +10,8 @@ int main() {
 
     save_redirections();
 
+    setup_signals();
+
     while (1) {
         reset_redirections();
         

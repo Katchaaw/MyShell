@@ -1,5 +1,7 @@
 #include "main.h"
 
+int last_was_signal = 0;
+
 int execute_external_command(char *cmd, char **args) {
 
     pid_t pid = fork();
@@ -10,6 +12,8 @@ int execute_external_command(char *cmd, char **args) {
     
     // Exécution de la commande dans un processus fils
     if (pid == 0) {
+        restore_default_signals();
+
         if (execvp(cmd, args) == -1) {
             perror("execvp"); 
             exit(1);
@@ -23,10 +27,16 @@ int execute_external_command(char *cmd, char **args) {
         waitpid(pid, &status, 0); 
 
         // Retourne la valeur de sortie du processus fils
-        if (WIFEXITED(status)) {
-            return WEXITSTATUS(status);
+        if (WIFSIGNALED(status)) {
+            last_was_signal = 1;
+            return 255; // Valeur de retour définie dans l'énoncé
         } 
+        else if (WIFEXITED(status)) {
+            last_was_signal = 0;
+            return WEXITSTATUS(status);
+        }
 
+        last_was_signal = 1;
         return 1; 
     }
 

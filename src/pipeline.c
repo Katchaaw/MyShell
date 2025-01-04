@@ -114,13 +114,13 @@ int check_pipe(char **tokens) {
         if (strcmp(tokens[i], "|") == 0) {
             // Vérifier que ce n'est pas le premier ou le dernier élément
             if (i == 0 || tokens[i + 1] == NULL) {
-                fprintf(stderr, "Erreur : pipe en début ou fin de commande\n");
+                perror("Erreur : pipe en début ou fin de commande\n");
                 return 0; // Erreur, pipe en début ou fin
             }
 
             // Vérifier qu'il n'y a pas de pipes successifs
             if (is_previous_pipe) {
-                fprintf(stderr, "Erreur : pipe successif trouvé\n");
+                perror("Erreur : pipe successif trouvé\n");
                 return 0; // Erreur, deux pipes successifs
             }
 

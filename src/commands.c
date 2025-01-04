@@ -71,23 +71,17 @@ void replaceVariable(char *command, char variable, const char *replacement) {
 
 
 int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
-    //printf("cmd : %s",cmd);
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
 
-    
     char *command_cop = strdup(command);
     char *res = command_cop;
-
-    //printf("commande : %s\n",cmd);
 
     // Gestion des commandes multiples - séparées par ';'.
     if ((strstr(res, ";")) != NULL){
         if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL || (strstr(res, "} ;")) != NULL ){
         char *cmd1 = strtok(command_cop, ";");
         char *cmd2 = strtok(NULL, "\0");
-
-        //printf("cmd 1 : %s ; cmd2 : %s",cmd1,cmd2);
 
         execute_command(cmd1, file, directory, variable);
         int result = execute_command(cmd2, file, directory, variable);
@@ -156,6 +150,6 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     }
 
     free(command_copy);
-    fprintf(stderr, "Erreur: commande vide après substitution\n");
+    perror("Erreur: commande vide après substitution\n");
     return 1;
 }

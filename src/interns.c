@@ -7,7 +7,6 @@
 #include <limits.h>
 
 
-
 int fsh_pwd() {
     // Buffer pour stocker le chemin du répertoire courant
     char cwd[PATH_MAX]; 
@@ -38,7 +37,7 @@ int fsh_cd(const char *path) {
     // Si path est NULL, on retourne vers $HOME
     if (path == NULL) {
         if (home == NULL) {
-            fprintf(stderr, "Erreur: HOME non défini\n");
+            perror("Erreur: HOME non défini\n");
             return 1;
         }
         // Change au répertoire HOME
@@ -118,7 +117,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
     // Vérification supplémentaire pour les arguments multiples
     if (strcmp(command, "cd") == 0) {
         if (arg && strtok(NULL, " ") != NULL) { // Plus d'un argument détecté
-            fprintf(stderr, "cd: too many arguments\n");
+            perror("cd: too many arguments\n");
             *last_return = 1;
             return 0;
         }
@@ -126,7 +125,11 @@ int handle_interns(char *command, char *arg, int *last_return) {
     }
     else if (strcmp(command, "pwd") == 0) {
         if (arg) { // pwd ne prend pas d'arguments
-            fprintf(stderr, "pwd: %s: invalid argument\n", arg);
+            const char *msg_prefix = "pwd: ";
+            const char *msg_suffix = ": invalid argument\n";
+            write(STDERR_FILENO, msg_prefix, strlen(msg_prefix));    // "pwd: "
+            write(STDERR_FILENO, arg, strlen(arg));                  // L'argument
+            write(STDERR_FILENO, msg_suffix, strlen(msg_suffix));    // ": invalid argument\n"
             *last_return = 1;
             return 0;
         }
@@ -134,7 +137,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
     }
     else if (strcmp(command, "exit") == 0) {
         if (arg && strtok(NULL, " ") != NULL) { // Plus d'un argument détecté
-            fprintf(stderr, "exit: too many arguments\n");
+            perror("exit: too many arguments\n");
             *last_return = 1;
             return 0;
         }
@@ -144,7 +147,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
     }
     else if (strcmp(command, "ftype") == 0) {
         if (!arg || strtok(NULL, " ") != NULL) { // Pas d'argument ou trop d'arguments
-            fprintf(stderr, "ftype: invalid number of arguments\n");
+            perror("ftype: invalid number of arguments\n");
             *last_return = 1;
             return 0;
         }

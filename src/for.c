@@ -15,7 +15,6 @@
 int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *opt_ext, char opt_type, char variable, int opt_p, int max_p) { 
     int last_return = 0;  
     int active_processes = 0; // Nombre de processus actifs
-    //printf("\n cmd from for : %s\n",cmd);
     // Ouverture du répertoire
     DIR *dir = opendir(rep);
     if (dir == NULL) {
@@ -80,11 +79,10 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
 
         // Gestion de l'option -p (traitement parallèle)
         if (opt_p) {
-            //printf("val max : %d\n", max_p);
             // Attendre si le nombre de processus actifs atteint max_p
             while (active_processes >= max_p) {
                     int status;
-                    pid_t child_pid = wait(&status); // Attendre qu'un processus enfant se termine
+                    wait(&status);
                     active_processes--;
 
                     // Récupérer la valeur de retour du processus enfant
@@ -94,7 +92,7 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
                             last_return = child_return;
                         }
                     } else {
-                        fprintf(stderr, "Un processus enfant (%d) s'est terminé anormalement.\n", child_pid);
+                        perror("Un processus enfant s'est terminé anormalement.\n");
                     }
                 }
 
@@ -177,7 +175,7 @@ int handle_for(char *arg, int *last_return) {
         }
         
         if (cmd_start == NULL) {
-            fprintf(stderr, "Erreur: '{' manquant\n");
+            perror("Erreur: '{' manquant\n");
             *last_return = 1;
             return 1;
         }
@@ -197,12 +195,10 @@ int handle_for(char *arg, int *last_return) {
         while (segment != NULL) {
             // Ajouter le segment à la commande complète avec un espace
             
-            //printf("segment : %s\n",segment);
             if (strstr(segment,";") && !strstr(segment,"}")){
                 segment+=2;
                 //segment = strtok(NULL,";");
                 char *cmd2 = strdup(segment);
-                //printf("in if segment : %s\n",segment);
                 *last_return = execute_command(cmd2, NULL, NULL, 'A');
                 segment = NULL;
             }
@@ -217,7 +213,6 @@ int handle_for(char *arg, int *last_return) {
         
             char *cmd_final = full_command;
         //strcat(cmd_final, "}");
-        //printf("cmd_final : %s\n", cmd_final);
 
         // Nettoyer la commande finale (supprimer les espaces inutiles)
         
@@ -230,12 +225,12 @@ int handle_for(char *arg, int *last_return) {
             *last_return = fsh_for(rep, cmd_final,opt_A,opt_r,ext,*type0,*arg,opt_p,max_p);
         } 
         else {
-            fprintf(stderr, "Syntaxe incorrecte: for F in REP { CMD }\n");
+            perror("Syntaxe incorrecte: for F in REP { CMD }\n");
             *last_return = 1;
         }
     } 
     else {
-        fprintf(stderr, "Erreur: syntaxe incorrecte, la commande doit être : for F in REP { CMD }\n");
+        perror("Erreur: syntaxe incorrecte, la commande doit être : for F in REP { CMD }\n");
         *last_return = 1;
     }
 

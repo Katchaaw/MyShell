@@ -68,32 +68,45 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
 
         // Gestion de l'option -p (traitement parallèle)
         if (opt_p) {
+            //printf("val max : %d\n", max_p);
             // Attendre si le nombre de processus actifs atteint max_p
             while (active_processes >= max_p) {
-                wait(NULL); // Attendre qu'un processus enfant se termine
-                active_processes--;
-            }
+                    int status;
+                    pid_t child_pid = wait(&status); // Attendre qu'un processus enfant se termine
+                    active_processes--;
 
-            pid_t pid = fork();
-            if (pid == 0) {
-                // Processus enfant
-                exit(execute_command(cmd, filepath, filepath, variable));
-            } else if (pid > 0) {
+                    // Récupérer la valeur de retour du processus enfant
+                    if (WIFEXITED(status)) {
+                        int child_return = WEXITSTATUS(status);
+                        if (child_return > last_return) {
+                            last_return = child_return;
+                        }
+                    } else {
+                        fprintf(stderr, "Un processus enfant (%d) s'est terminé anormalement.\n", child_pid);
+                    }
+                }
+
+                pid_t pid = fork();
+                if (pid == 0) {
+                    // Processus enfant
+                    exit(execute_command(cmd, filepath, filepath, variable));
+                } else if (pid > 0) {
                 // Processus parent
                 active_processes++;
-            } else {
-                perror("Erreur lors de la création du processus");
-                closedir(dir);
-                return 1;
-            }
-        } else {
-            // Exécution séquentielle si -p n'est pas activé
-            int last_returnTemp = execute_command(cmd, filepath, filepath, variable);
-            if (last_returnTemp > last_return) {
-                last_return = last_returnTemp;
-            }
+                } else {
+                    perror("Erreur lors de la création du processus");
+                    closedir(dir);
+                    return 1;
+                }
+                } else {
+                    // Exécution séquentielle si -p n'est pas activé
+                    int last_returnTemp = execute_command(cmd, filepath, filepath, variable);
+                    if (last_returnTemp > last_return) {
+                        last_return = last_returnTemp;
+                    }
+                }
         }
-    }
+
 
     // Attendre la fin de tous les processus enfants
     while (active_processes > 0) {

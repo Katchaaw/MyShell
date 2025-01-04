@@ -3,7 +3,7 @@
 int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *opt_ext, char opt_type, char variable, int opt_p, int max_p) { 
     int last_return = 0;  
     int active_processes = 0; // Nombre de processus actifs
-
+    //printf("\n cmd from for : %s\n",cmd);
     // Ouverture du répertoire
     DIR *dir = opendir(rep);
     if (dir == NULL) {
@@ -157,6 +157,13 @@ int handle_for(char *arg, int *last_return) {
 
     if (var && in && rep && strcmp(in, "in") == 0) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
+        char *verifAc = cmd_start;
+        int multiAc = 0;
+        if (strstr(verifAc,"{") && strstr(verifAc,"if [")){
+            multiAc = 1;
+            
+        }
+        
         if (cmd_start == NULL) {
             fprintf(stderr, "Erreur: '{' manquant\n");
             *last_return = 1;
@@ -169,6 +176,9 @@ int handle_for(char *arg, int *last_return) {
         //Construire la commande complète.
         char full_command[MAX_CMD_LENGTH] = {0};
         strcat(full_command, cmd_start);
+        if (multiAc){
+            strcat(full_command, "}");
+        }
         
         char *segment = strtok(NULL, "}"); // Premier segment jusqu'à '}'
 
@@ -192,24 +202,8 @@ int handle_for(char *arg, int *last_return) {
             segment = strtok(NULL, "}"); // Chercher le prochain segment
             }
         }
-        /*
-        char *command_cop = strdup(full_command);
-        //printf("cmd_full : %s\n", full_command);
-        char *cmd_final;
-        printf("cmdddd : %s\n",command_cop);
-        // Gestion des commandes multiples - séparées par ';'.
-        if ((strstr(command_cop, "};")) != NULL){
-            //printf("cmdddd : %s\n",command_cop);
-           cmd_final = strtok(command_cop, ";");
-            char *cmd2 = strtok(NULL, "\0");
-            cmd2 = strtok(cmd2,"}");
-            *last_return = execute_command(cmd2, NULL, NULL, NULL);
-            //printf("cmd_final : %s\n", cmd_final);
-            //printf("cmd2 : %s\n", cmd2);            
-        }*/
-        //else{
+        
             char *cmd_final = full_command;
-        //}
         //strcat(cmd_final, "}");
         //printf("cmd_final : %s\n", cmd_final);
 

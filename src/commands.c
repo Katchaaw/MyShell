@@ -61,7 +61,7 @@ void replaceVariable(char *command, char variable, const char *replacement) {
 
 
 int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
-
+    //printf("cmd : %s",cmd);
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
 

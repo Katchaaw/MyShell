@@ -69,6 +69,8 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     char *command_cop = strdup(command);
     char *res = command_cop;
 
+    //printf("commande : %s\n",cmd);
+
     // Gestion des commandes multiples - séparées par ';'.
     if ((strstr(res, ";")) != NULL){
         if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL || (strstr(res, "} ;")) != NULL ){

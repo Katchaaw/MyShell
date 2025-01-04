@@ -174,15 +174,47 @@ int handle_for(char *arg, int *last_return) {
 
         while (segment != NULL) {
             // Ajouter le segment à la commande complète avec un espace
+            
+            //printf("segment : %s\n",segment);
+            if (strstr(segment,";") && !strstr(segment,"}")){
+                segment+=2;
+                //segment = strtok(NULL,";");
+                char *cmd2 = strdup(segment);
+                //printf("in if segment : %s\n",segment);
+                *last_return = execute_command(cmd2, NULL, NULL, 'A');
+                segment = NULL;
+            }
+            else {
+            // Vérifier s'il reste quelque chose après '}'
             strcat(full_command, segment);
             strcat(full_command, "}");
-
-            // Vérifier s'il reste quelque chose après '}'
+            segment++;
             segment = strtok(NULL, "}"); // Chercher le prochain segment
+            }
         }
+        /*
+        char *command_cop = strdup(full_command);
+        //printf("cmd_full : %s\n", full_command);
+        char *cmd_final;
+        printf("cmdddd : %s\n",command_cop);
+        // Gestion des commandes multiples - séparées par ';'.
+        if ((strstr(command_cop, "};")) != NULL){
+            //printf("cmdddd : %s\n",command_cop);
+           cmd_final = strtok(command_cop, ";");
+            char *cmd2 = strtok(NULL, "\0");
+            cmd2 = strtok(cmd2,"}");
+            *last_return = execute_command(cmd2, NULL, NULL, NULL);
+            //printf("cmd_final : %s\n", cmd_final);
+            //printf("cmd2 : %s\n", cmd2);            
+        }*/
+        //else{
+            char *cmd_final = full_command;
+        //}
+        //strcat(cmd_final, "}");
+        //printf("cmd_final : %s\n", cmd_final);
 
         // Nettoyer la commande finale (supprimer les espaces inutiles)
-        char *cmd_final = full_command;
+        
         while (*cmd_final == ' ' || *cmd_final == '\t') {
             cmd_final++;
         }

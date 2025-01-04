@@ -1,44 +1,98 @@
 #include "main.h"
+#define MAX_LENGTH 256
 
 // Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
 int execute_external_command(char *cmd, char **args);
 
+char *args_to_cmd(char **args) {
+    if (args == NULL) return NULL;
 
-int execute_command(const char *cmd, const char *file) {
-    //printf("DEBUG: Commande initiale : %s, Fichier : %s\n", cmd, file);
+    // Calculer la taille totale de la commande.
+    size_t total_length = 0;
+    for (int i = 0; args[i] != NULL; i++) {
+        total_length += strlen(args[i])+1;
+    }
+
+    // Allouer la mémoire pour la commande finale.
+    char *cmd = malloc(total_length + 1);
+    if (cmd == NULL) {
+        perror("malloc failed");
+        return NULL;
+    }
+
+    // Concaténer les chaînes dans cmd
+    cmd[0] = '\0';
+    for (int i = 0; args[i] != NULL; i++) {
+        strcat(cmd, args[i]);
+        strcat(cmd, " ");
+    }
+    return cmd;
+}
+
+int execute_from_if(char **args){
+    char *new_cmd = args_to_cmd(args);  // Transforme les arguments en une seule commande.
+    int result = execute_command(new_cmd, NULL, NULL, 0);  
+    free(new_cmd);  
+    return result;
+}
+
+
+void replaceVariable(char *command, char variable, const char *replacement) {
+    char buffer[MAX_LENGTH];  // Buffer temporaire pour la commande modifiée.
+    char *pos = command;
+    char *match;
+
+    buffer[0] = '\0';
+
+    while ((match = strstr(pos, "$")) != NULL) {
+        if (*(match + 1) == variable) {
+            strncat(buffer, pos, match - pos);  // Ajouter la partie avant `$variable`.
+            strncat(buffer, replacement, strlen(replacement));  // Ajouter la valeur de remplacement.
+            pos = match + 2;  // Passer `$variable`.
+        } else {
+            strncat(buffer, pos, match - pos + 1);  // Ajouter jusqu'au caractère suivant '$'.
+            pos = match + 1;
+        }
+    }
+    strncat(buffer, pos, MAX_LENGTH - strlen(buffer) - 1);  // Ajouter le reste de la commande.
+    strncpy(command, buffer, MAX_LENGTH - 1);  
+    command[MAX_LENGTH - 1] = '\0';
+}
+
+
+int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
 
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
 
-    // Remplacement de toutes les occurrences de $F dans la commande par le chemin du fichier.
-    char *pos = command;
-    while ((pos = strstr(pos, "$F")) != NULL) {
-        // Créer la nouvelle commande avec la substitution
-        char new_cmd[1024];
-        // Copier tout avant $F
-        int len_before = pos - command;
-        snprintf(new_cmd, len_before + 1, "%s", command);
-        
-        // Ajouter le fichier
-        snprintf(new_cmd + len_before, sizeof(new_cmd) - len_before, "%s", file);
-        
-        // Ajouter la partie après $F
-        snprintf(new_cmd + len_before + strlen(file), sizeof(new_cmd) - (len_before + strlen(file)), "%s", pos + 2);
+    
+    char *command_cop = strdup(command);
+    char *res = command_cop;
 
-        // Copier la nouvelle commande dans la variable d'origine
-        strncpy(command, new_cmd, sizeof(command) - 1);
-        command[sizeof(command) - 1] = '\0';
+    // Gestion des commandes multiples - séparées par ';'.
+    if ((strstr(res, ";")) != NULL){
+        if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL){
+        char *cmd1 = strtok(command_cop, ";");
+        char *cmd2 = strtok(NULL, "\0");
 
-        // Avancer pour remplacer les autres occurrences
-        pos = command + len_before + strlen(file);
+        execute_command(cmd1, file, directory, variable);
+        int result = execute_command(cmd2, file, directory, variable);
+            
+        free(command_cop);
+
+        return result;
+        }
     }
+    free(command_cop);
 
+    // Remplacement des variables dans la commande.
+    if (variable != '\0'){
+        replaceVariable(command,variable,file);
+    }
 
     // Tokenisation de la commande.
     char *tokens[MAX_TOKENS];
     int nb_tokens = 0;
-
-    // Copie de la commande pour la tokenisation.
     char *command_copy = strdup(command);
     if (!command_copy) {
         perror("Erreur d'allocation mémoire");
@@ -46,33 +100,42 @@ int execute_command(const char *cmd, const char *file) {
     }
 
     tokenizer(command_copy, tokens, &nb_tokens, " ");
-    /*printf("DEBUG: Commande tokenisée : ");
-    for (int i = 0; i < nb_tokens; i++) {
-        printf("[%s] ", tokens[i]);
-    }
-    printf("\n");*/
 
     // Exécution de/des commande(s)
     if (nb_tokens > 0) {
         char *cmd_name = tokens[0];
         char *arg = nb_tokens > 1 ? tokens[1] : NULL;
 
-        //printf("DEBUG: Commande à exécuter : %s, Premier argument : %s\n", cmd_name, arg ? arg : "NULL");
-
-        // Commande interne
         int last_return = 0;
+
+        // Gestion des commandes internes
         if (handle_interns(cmd_name, arg, &last_return) == 0) {
-            //printf("DEBUG: Commande à exécuter : %s, Premier argument : %s\n", cmd_name, arg ? arg : "NULL");
             cleanup_tokens(tokens, &nb_tokens); 
             free(command_copy);
             return last_return;
         }
 
-        // Commande externe
+        // Gestion des boucles 'for'
+        else if (strcmp(cmd_name, "for") == 0) {
+            strtok(command," ");
+            char *arg = strtok(NULL," ");
+            handle_for(arg, &last_return);
+            cleanup_tokens(tokens, &nb_tokens); 
+            free(command_copy);
+            return last_return;
+        }
+
+        // Gestion des 'if'
+        else if (strcmp(cmd_name, "if") == 0) {
+            handle_if_else(tokens, &nb_tokens,&last_return);
+            cleanup_tokens(tokens, &nb_tokens); 
+            free(command_copy);
+            return last_return;
+        }
+        
+        // Gestion des commandes externes
         int result = execute_external_command(cmd_name, tokens);
-        //printf("DEBUG: Commande externe exécutée avec code retour : %d\n", result);
-
-
+       
         cleanup_tokens(tokens, &nb_tokens); 
         free(command_copy);
         return result;

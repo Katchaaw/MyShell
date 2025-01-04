@@ -1,36 +1,39 @@
 #include "main.h"
 
+static int saved_stdin, saved_stdout, saved_stderr;
+
 int handle_redirections(char **tokens, int *nb_tokens) {
 
+    // Parcours des tokens pour identifier les redirections.
     for (int i = 0; i < *nb_tokens; i++) {
         int fd = -1; // Descripteur de fichier
         int target_fd = -1; // Descripteur de fichier cible : entrée, sortie ou erreur
-        int flags = 0;
+        int flags = 0; // Drapeaux pour l'ouverture des fichiers
 
         // Identifie le type de redirection
         if (strcmp(tokens[i], "<") == 0) {
             target_fd = STDIN_FILENO; // Redirection de l'entrée standard
-            flags = O_RDONLY;
+            flags = O_RDONLY; // Ouverture en lecture seule
         } else if (strcmp(tokens[i], ">") == 0) {
-            target_fd = STDOUT_FILENO; // Redirection de la sortie standard
-            flags = O_WRONLY | O_CREAT | O_EXCL; // echec si le fichier existe
+            target_fd = STDOUT_FILENO; // Redirection de sortie
+            flags = O_WRONLY | O_CREAT | O_EXCL; // Echec si fichier existe déjà
         } else if (strcmp(tokens[i], ">|") == 0) {
             target_fd = STDOUT_FILENO;
-            flags = O_WRONLY | O_CREAT | O_TRUNC; // ecrasement
+            flags = O_WRONLY | O_CREAT | O_TRUNC; // Ecraseement
         } else if (strcmp(tokens[i], ">>") == 0) {
             target_fd = STDOUT_FILENO;
-            flags = O_WRONLY | O_CREAT | O_APPEND; // concatenation
+            flags = O_WRONLY | O_CREAT | O_APPEND; // Concatenation
         } else if (strcmp(tokens[i], "2>") == 0) {
             target_fd = STDERR_FILENO;
-            flags = O_WRONLY | O_CREAT | O_EXCL; // echec si le fichier existe
+            flags = O_WRONLY | O_CREAT | O_EXCL; // Echec si le fichier existe
         } else if (strcmp(tokens[i], "2>|") == 0) {
             target_fd = STDERR_FILENO;
-            flags = O_WRONLY | O_CREAT | O_TRUNC; // ecrasement
+            flags = O_WRONLY | O_CREAT | O_TRUNC; // Ecrasement
         } else if (strcmp(tokens[i], "2>>") == 0) {
             target_fd = STDERR_FILENO;
-            flags = O_WRONLY | O_CREAT | O_APPEND; // concatenation
+            flags = O_WRONLY | O_CREAT | O_APPEND; // Concatenation
         } else {
-            continue; // Aucun opérateur de redirection détecté
+            continue;
         }
 
         // Vérifie qu'un fichier suit l'opérateur
@@ -39,12 +42,12 @@ int handle_redirections(char **tokens, int *nb_tokens) {
             return 1;
         }
 
-        char *filename = tokens[i + 1];
-
         // Ouvre le fichier avec les bons drapeaux
+        char *filename = tokens[i + 1];
         fd = open(filename, flags, 0644);
         if (fd == -1) {
             perror("Erreur d'ouverture du fichier");
+            close(fd);
             return 1;
         }
 
@@ -55,7 +58,17 @@ int handle_redirections(char **tokens, int *nb_tokens) {
             return 1;
         }
 
-        close(fd);
+        close(fd); //Ferme le descripteur de fichier
+
+        // Libère la mémoire des éléments supprimés du tableau
+        if (tokens[i]) {
+            free(tokens[i]);
+            tokens[i] = NULL;
+        }
+        if (tokens[i + 1]) {
+            free(tokens[i + 1]);
+            tokens[i + 1] = NULL;
+        }
 
         // Supprime l'opérateur et le fichier des tokens
         for (int j = i; j + 2 < *nb_tokens; j++) {
@@ -69,8 +82,6 @@ int handle_redirections(char **tokens, int *nb_tokens) {
     }
     return 0;
 }
-
-static int saved_stdin, saved_stdout, saved_stderr;
 
 void save_redirections() {
     if ((saved_stdin = dup(STDIN_FILENO)) == -1 ||
@@ -92,3 +103,4 @@ void close_saved_redirections() {
     close(saved_stdout);
     close(saved_stderr);
 }
+

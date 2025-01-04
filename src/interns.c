@@ -132,7 +132,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
         }
         int exit_code = arg ? atoi(arg) : *last_return;
         fsh_exit(exit_code);
-        return -1; // Terminaison immédiate
+        return -1; 
     }
     else if (strcmp(command, "ftype") == 0) {
         if (!arg || strtok(NULL, " ") != NULL) { // Pas d'argument ou trop d'arguments
@@ -146,5 +146,5 @@ int handle_interns(char *command, char *arg, int *last_return) {
         return 1; // Commande non interne
     }
 
-    return 0; // Commande interne gérée
+    return 0;
 }

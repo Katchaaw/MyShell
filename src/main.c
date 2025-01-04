@@ -50,6 +50,22 @@ int main() {
             continue;
         }
 
+        // Modifie la ligne pour supprimer les redirections
+        line[0] = '\0';  // Vide la ligne initiale
+        for (int i = 0; i < nb_tokens; i++) {
+            if (i > 0) {
+                strcat(line, " ");  // Ajoute un espace entre les tokens
+            }
+            strcat(line, tokens[i]);  // Concatène chaque token à 'line'
+        }
+
+        if (strcmp(tokens[0], "if") == 0) {
+            if (handle_if_else(tokens, &nb_tokens, &last_return) == 0) {
+                free(line);
+                continue;
+            }
+        }
+
         // Séparation commande / argument
         char *command = strtok(line, " ");
         char *arg = strtok(NULL, " ");
@@ -62,7 +78,14 @@ int main() {
         // Gestion des commandes internes
         if (handle_interns(command, arg, &last_return) == 0) {
             free(line);
-            continue;;
+            continue;
+        }
+
+        //Gestion des boucles for
+        else if (strcmp(command, "for") == 0) {
+            handle_for(arg, &last_return);
+            free(line);
+            continue;
         }
 
         // Gestion des commandes externes
@@ -77,14 +100,6 @@ int main() {
             // Exécute la commande et met a jour la valeur de retour
             last_return = execute_external_command(command, argv);
         }
-
-        //Gestion des boucles for
-        if (strcmp(command, "for") == 0) {
-            handle_for(arg, &last_return);
-            free(line);
-            continue;
-        }
-        
         free(line);
     }
 
@@ -93,4 +108,5 @@ int main() {
     exit(last_return); 
     return 0;
 }
+
 

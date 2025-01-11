@@ -54,6 +54,8 @@ int main() {
             continue;
         }
 
+        
+
         if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
             last_return = execute_command(copy_line,NULL,NULL,'a');
             continue;
@@ -107,7 +109,8 @@ int main() {
 
         //Gestion des boucles for
         else if (strcmp(command, "for") == 0) {
-            handle_for(arg, &last_return);
+            //handle_for(arg, &last_return);
+            last_return = execute_command(command,NULL,NULL,'a');           
             free(line);
             continue;
         }

@@ -75,8 +75,47 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     char *command_cop = strdup(command);
     char *res = command_cop;
 
+    int nAcc = 0;
+    int nPV = 0;
+    while(*res!='\0'){
+        if (*res == '{') nAcc ++;
+        if (*res == '}') nAcc --;
+        if (*res == ';'){
+            if (nAcc==0){
+                char concat[MAX_CMD_LENGTH] = {0};
+                char *cut=strtok(command_cop,";");
+                strcat(concat,cut);
+                for (int i =0; i<nPV ; i++){
+                    strcat(concat,";");
+                    cut = strtok(NULL,";");
+                    strcat(concat,cut);
+                }
+                char *cmd2 = strtok(NULL,"\0");
+                int result = execute_command(concat, file, directory, variable);
+                if (last_was_signal !=2){
+                    result = execute_command(cmd2, file, directory, variable);
+                }
+                return result;
+
+            }
+            else nPV++;
+
+
+
+        }
+        res++;
+
+    }
+
+
+
+
+
+
+
+
     // Gestion des commandes multiples - séparées par ';'.
-    if ((strstr(res, ";")) != NULL){
+    /*if ((strstr(res, ";")) != NULL){
         if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL || (strstr(res, "} ;")) != NULL ){
         char *cmd1 = strtok(command_cop, ";");
         char *cmd2 = strtok(NULL, "\0");
@@ -92,7 +131,7 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     
         return result;
         }
-    }
+    }*/
     free(command_cop);
 
     // Remplacement des variables dans la commande.

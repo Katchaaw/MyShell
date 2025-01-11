@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include "externs.h"
 
 
 int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *opt_ext, char opt_type, char variable, int opt_p, int max_p) { 
@@ -25,7 +26,7 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
 
     // Parcours des fichiers du répertoire.
     struct dirent *entry;
-    while ((entry = readdir(dir)) != NULL) {
+    while ((entry = readdir(dir)) != NULL && (last_was_signal !=2)) {
         // Ignorer les entrées "." et ".." si l'option -A est activée
         if ((opt_A && strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0)) {
             continue;
@@ -133,7 +134,6 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
 
 int handle_for(char *arg, int *last_return) {
     int have_opt = 0;
-
     int opt_A = 0;    // Option pour inclure les fichiers cachés
     int opt_r = 0;    // Option pour activer la récursion
     char *ext = "";   // Extension à filtrer
@@ -144,7 +144,6 @@ int handle_for(char *arg, int *last_return) {
     char *in = strtok(NULL, " ");
     char *rep = strtok(NULL, " "); // Répertoire à parcourir
     char *opt = strtok(NULL, " "); // Options
-
     // Analyse des options.
     while (strcmp(opt, "{")!=0 && *opt !='\0'){    
         if (strcmp(opt, "-A")==0){
@@ -165,12 +164,11 @@ int handle_for(char *arg, int *last_return) {
         }
         opt = strtok(NULL," ");
     }
-
     if (var && in && rep && strcmp(in, "in") == 0) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
         char *verifAc = cmd_start;
         int multiAc = 0;
-        if (strstr(verifAc,"{") && (strstr(verifAc,"if [") || strstr(verifAc,"; if"))){
+        if (strstr(verifAc,"{") && strstr(verifAc,"if")){
             multiAc = 1;
         }
         
@@ -188,28 +186,20 @@ int handle_for(char *arg, int *last_return) {
         char full_command[MAX_CMD_LENGTH] = {0};
         strcat(full_command, cmd_start);
 
+        
+        
+        char *segment = strtok(NULL, "}"); // Premier segment jusqu'à '}'
         if (multiAc){
             strcat(full_command, "}");
         }
-        
-        char *segment = strtok(NULL, "}"); // Premier segment jusqu'à '}'
-
         while (segment != NULL) {
-            // Ajouter le segment à la commande complète avec un espace
-            
-            if (strstr(segment,";") && !strstr(segment,"}")){
-                segment+=2;
-                char *cmd2 = strdup(segment);
-                *last_return = execute_command(cmd2, NULL, NULL, 'A');
-                segment = NULL;
-            } 
-            else {
-                // Vérifier s'il reste quelque chose après '}'
-                strcat(full_command, segment);
+
+           strcat(full_command, segment);
+           segment = strtok(NULL, "}");
+           if (segment !=NULL){
                 strcat(full_command, "}");
-                segment++;
-                segment = strtok(NULL, "}"); // Chercher le prochain segment
-            }
+           }
+            // Chercher le prochain segment
         }
         
         char *cmd_final = full_command;

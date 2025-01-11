@@ -54,11 +54,12 @@ int main() {
             continue;
         }
 
+        
+
         if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
             last_return = execute_command(copy_line,NULL,NULL,'a');
             continue;
         }
-
         // Tokenisation de la ligne
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
@@ -107,7 +108,13 @@ int main() {
 
         //Gestion des boucles for
         else if (strcmp(command, "for") == 0) {
-            handle_for(arg, &last_return);
+            char concat[MAX_CMD_LENGTH] = {0};
+            char *suite_cmd = strtok(NULL,"\0");
+            strcat(concat,"for ");
+            strcat(concat,arg);
+            strcat(concat," ");
+            strcat(concat,suite_cmd);
+            last_return = execute_command(concat,NULL,NULL,'\0');
             free(line);
             continue;
         }

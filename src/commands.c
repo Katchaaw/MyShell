@@ -50,6 +50,7 @@ void replaceVariable(char *command, char variable, const char *replacement) {
     char *pos = command;
     char *match;
 
+
     buffer[0] = '\0';
 
     while ((match = strstr(pos, "$")) != NULL) {
@@ -69,30 +70,44 @@ void replaceVariable(char *command, char variable, const char *replacement) {
 
 
 int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
+    
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
-
     char *command_cop = strdup(command);
     char *res = command_cop;
 
-    // Gestion des commandes multiples - séparées par ';'.
-    if ((strstr(res, ";")) != NULL){
-        if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL || (strstr(res, "} ;")) != NULL ){
-        char *cmd1 = strtok(command_cop, ";");
-        char *cmd2 = strtok(NULL, "\0");
+    int nAcc = 0;
+    int nPV = 0;
 
-        //printf("cmd 1 : %s ; cmd2 : %s",cmd1,cmd2);
 
-        int result = execute_command(cmd1, file, directory, variable);
-        if (last_was_signal !=2){
-            result = execute_command(cmd2, file, directory, variable);
+    //gestion principale des séquences 
+    while(*res!='\0'){
+        if (*res == '{') nAcc ++;
+        if (*res == '}') nAcc --;
+        if (*res == ';'){
+            if (nAcc==0){
+                char concat[MAX_CMD_LENGTH] = {0};
+                char *cut=strtok(command_cop,";");
+                strcat(concat,cut);
+                for (int i =0; i<nPV ; i++){
+                    strcat(concat,";");
+                    cut = strtok(NULL,";");
+                    strcat(concat,cut);
+                }
+                char *cmd2 = strtok(NULL,"\0");
+                int result = execute_command(concat, file, directory, variable);
+                if (last_was_signal !=2){
+                    result = execute_command(cmd2, file, directory, variable);
+                }
+                free(cut);
+                return result;
+
+            }
+            else nPV++;
         }
-        //printf("\ncmd : %s , result : %d\n",cmd,result);
-        free(command_cop);
-    
-        return result;
-        }
+        res++;
     }
+
     free(command_cop);
 
     // Remplacement des variables dans la commande.

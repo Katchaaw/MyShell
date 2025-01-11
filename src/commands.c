@@ -69,6 +69,7 @@ void replaceVariable(char *command, char variable, const char *replacement) {
 
 
 int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
+    
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
 
@@ -95,6 +96,7 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
                 if (last_was_signal !=2){
                     result = execute_command(cmd2, file, directory, variable);
                 }
+                free(cut);
                 return result;
 
             }
@@ -138,6 +140,8 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     if (variable != '\0'){
         replaceVariable(command,variable,file);
     }
+
+    //printf("cmd : %s\n",command);
 
     // Tokenisation de la commande.
     char *tokens[MAX_TOKENS];

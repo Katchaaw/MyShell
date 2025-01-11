@@ -60,7 +60,8 @@ int main() {
             last_return = execute_command(copy_line,NULL,NULL,'a');
             continue;
         }
-
+        //printf("copy line : %s \n",copy_line);
+        char *line2 = strdup(copy_line);
         // Tokenisation de la ligne
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
@@ -68,11 +69,13 @@ int main() {
         if (check_pipe(tokens) == 1) {
             if (handle_pipe(tokens) == 0) {
                 free(line);
+                free(line2);
                 continue;
             }
         } else if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
+            free(line2);
             continue;
         }
 
@@ -88,6 +91,7 @@ int main() {
         if (strcmp(tokens[0], "if") == 0) {
             if (handle_if_else(tokens, &nb_tokens, &last_return) == 0) {
                 free(line);
+                free(line2);
                 continue;
             }
         }
@@ -98,19 +102,23 @@ int main() {
 
         if (!command) {
             free(line);
+            free(line2);
             continue;
         }
 
         // Gestion des commandes internes
         if (handle_interns(command, arg, &last_return) == 0) {
             free(line);
+            free(line2);
             continue;
         }
 
         //Gestion des boucles for
         else if (strcmp(command, "for") == 0) {
+            //printf("command main : %s \n",line2); 
             //handle_for(arg, &last_return);
-            last_return = execute_command(command,NULL,NULL,'a');           
+            last_return = execute_command(line2,NULL,NULL,'\0');
+            free(line2);
             free(line);
             continue;
         }
@@ -128,6 +136,7 @@ int main() {
             last_return = execute_external_command(command, argv);
         }
         free(line);
+        free(line2);
     }
 
     cleanup_tokens(tokens, &nb_tokens);

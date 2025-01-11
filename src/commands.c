@@ -109,39 +109,12 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
 
     }
 
-
-
-
-
-
-
-
-    // Gestion des commandes multiples - séparées par ';'.
-    /*if ((strstr(res, ";")) != NULL){
-        if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL || (strstr(res, "} ;")) != NULL ){
-        char *cmd1 = strtok(command_cop, ";");
-        char *cmd2 = strtok(NULL, "\0");
-
-        //printf("cmd 1 : %s ; cmd2 : %s",cmd1,cmd2);
-
-        int result = execute_command(cmd1, file, directory, variable);
-        if (last_was_signal !=2){
-            result = execute_command(cmd2, file, directory, variable);
-        }
-        //printf("\ncmd : %s , result : %d\n",cmd,result);
-        free(command_cop);
-    
-        return result;
-        }
-    }*/
     free(command_cop);
 
     // Remplacement des variables dans la commande.
     if (variable != '\0'){
         replaceVariable(command,variable,file);
     }
-
-    //printf("cmd : %s\n",command);
 
     // Tokenisation de la commande.
     char *tokens[MAX_TOKENS];

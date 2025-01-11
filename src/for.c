@@ -132,13 +132,7 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
 
 
 int handle_for(char *arg, int *last_return) {
-    //char *aff = strtok(NULL,"ù");
-    //printf("cmd : %s \n",aff);
-
-
-
     int have_opt = 0;
-    //printf("hereeee\n");
     int opt_A = 0;    // Option pour inclure les fichiers cachés
     int opt_r = 0;    // Option pour activer la récursion
     char *ext = "";   // Extension à filtrer
@@ -149,7 +143,6 @@ int handle_for(char *arg, int *last_return) {
     char *in = strtok(NULL, " ");
     char *rep = strtok(NULL, " "); // Répertoire à parcourir
     char *opt = strtok(NULL, " "); // Options
-    //printf("hereeee2\n");
     // Analyse des options.
     while (strcmp(opt, "{")!=0 && *opt !='\0'){    
         if (strcmp(opt, "-A")==0){
@@ -170,7 +163,6 @@ int handle_for(char *arg, int *last_return) {
         }
         opt = strtok(NULL," ");
     }
-    //printf("hereeee3\n");
     if (var && in && rep && strcmp(in, "in") == 0) {
         char *cmd_start = strtok(NULL, "}"); // On récupère le début après la première '{'
         char *verifAc = cmd_start;
@@ -200,21 +192,12 @@ int handle_for(char *arg, int *last_return) {
         char *segment = strtok(NULL, "}"); // Premier segment jusqu'à '}'
 
         while (segment != NULL) {
-            // Ajouter le segment à la commande complète avec un espace
-            
-            /*if (strstr(segment,";") && !strstr(segment,"}") && 0){
-                segment+=2;
-                char *cmd2 = strdup(segment);
-                *last_return = execute_command(cmd2, NULL, NULL, 'A');
-                segment = NULL;
-            }*/ 
-            //else {
-                // Vérifier s'il reste quelque chose après '}'
-                strcat(full_command, segment);
-                strcat(full_command, "}");
-                segment++;
-                segment = strtok(NULL, "}"); // Chercher le prochain segment
-            //}
+
+           // Vérifier s'il reste quelque chose après '}'
+           strcat(full_command, segment);
+           strcat(full_command, "}");
+           segment++;
+           segment = strtok(NULL, "}"); // Chercher le prochain segment
         }
         
         char *cmd_final = full_command;

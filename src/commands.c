@@ -50,7 +50,6 @@ void replaceVariable(char *command, char variable, const char *replacement) {
     char *pos = command;
     char *match;
 
-
     buffer[0] = '\0';
 
     while ((match = strstr(pos, "$")) != NULL) {
@@ -79,8 +78,7 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     int nAcc = 0;
     int nPV = 0;
 
-
-    //gestion principale des séquences 
+    // Gestion principale des séquences 
     while(*res!='\0'){
         if (*res == '{') nAcc ++;
         if (*res == '}') nAcc --;
@@ -101,7 +99,6 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
                 }
                 free(cut);
                 return result;
-
             }
             else nPV++;
         }

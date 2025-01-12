@@ -54,22 +54,26 @@ int main() {
             continue;
         }
 
-        
-
+        // Gestions des séquences
         if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
             last_return = execute_command(copy_line,NULL,NULL,'a');
             continue;
         }
+
         // Tokenisation de la ligne
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
 
+        // Gestion des pipelines
         if (check_pipe(tokens) == 1) {
             if (handle_pipe(tokens) == 0) {
                 free(line);
                 continue;
             }
-        } else if (handle_redirections(tokens, &nb_tokens) == 1) {
+        } 
+        
+        // Gestions des redirections
+        else if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
             continue;
@@ -84,6 +88,7 @@ int main() {
             strcat(line, tokens[i]);  // Concatène chaque token à 'line'
         }
 
+        // Gestion des if/else
         if (strcmp(tokens[0], "if") == 0) {
             if (handle_if_else(tokens, &nb_tokens, &last_return) == 0) {
                 free(line);

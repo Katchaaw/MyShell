@@ -14,8 +14,8 @@ int handle_pipe(char **tokens) {
     int pipes[MAX_CMDS - 1][2];         // Tableau pour stocker les pipes
     int cmd_count = 0;                  // Compteur de commandes
     char *commands[MAX_CMDS][MAX_ARGS]; // Commandes séparées en tokens
-
     int arg_index = 0;
+
     // Séparer les tokens en commandes
     for (int i = 0; tokens[i] != NULL; i++) {
         if (strcmp(tokens[i], "|") == 0) {
@@ -26,6 +26,7 @@ int handle_pipe(char **tokens) {
             commands[cmd_count][arg_index++] = tokens[i];
         }
     }
+
     commands[cmd_count][arg_index] = NULL; // Terminer la dernière commande
     cmd_count++;
 
@@ -45,8 +46,10 @@ int handle_pipe(char **tokens) {
         if (pid == -1) {
             perror("fork");
             return 1;
-        } else if (pid == 0) {
-            // Dans le processus fils
+        } 
+        
+        // Dans le processus fils
+        else if (pid == 0) {
 
             // Redirection de l'entrée si ce n'est pas la première commande
             if (i > 0) {
@@ -81,7 +84,6 @@ int handle_pipe(char **tokens) {
                 return 1;
             }
 
-            // Exécuter la commande
             if (execvp(commands[i][0], commands[i]) == -1) {
                 perror("execvp");
                 return 1;
@@ -107,7 +109,7 @@ int handle_pipe(char **tokens) {
 int check_pipe(char **tokens) {
     int i = 0;
     int is_previous_pipe = 0;
-    int pipe_found = 0;  // Pour savoir s'il y a des pipes dans la commande.
+    int pipe_found = 0;
 
     while (tokens[i] != NULL) {
         // Vérifier si un pipe est trouvé
@@ -115,13 +117,13 @@ int check_pipe(char **tokens) {
             // Vérifier que ce n'est pas le premier ou le dernier élément
             if (i == 0 || tokens[i + 1] == NULL) {
                 perror("Erreur : pipe en début ou fin de commande\n");
-                return 0; // Erreur, pipe en début ou fin
+                return 0;
             }
 
             // Vérifier qu'il n'y a pas de pipes successifs
             if (is_previous_pipe) {
                 perror("Erreur : pipe successif trouvé\n");
-                return 0; // Erreur, deux pipes successifs
+                return 0;
             }
 
             pipe_found = 1;  // On a trouvé au moins un pipe valide
@@ -133,5 +135,5 @@ int check_pipe(char **tokens) {
         i++;
     }
 
-    return pipe_found; // Retourne 1 si un pipeline valide est trouvé, sinon 0
+    return pipe_found; 
 }

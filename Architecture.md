@@ -3,11 +3,11 @@
 
 ## Introduction
 
-Ce document explique la stratégie adoptée pour réaliser le projet, en détaillant l'architecture logicielle, les structures de données et le algorithmes principaux implementés.
+Ce document explique la stratégie adoptée pour réaliser le projet, en détaillant l'architecture logicielle, les structures de données et les algorithmes principaux implementés.
 
 ## 1. Architecture logicielle
 
-La structure du projet peut être vue comme une **pyramide**. On a un fichier `main.c`, incluant tous les autres fichiers et contenant la boucle principale permettant de faire tourner *fsh*. Les autres fichiers a une responsabilité isolé pour chaque fonctionnalité du projet.
+La structure du projet peut être vue comme une **pyramide**. On a un fichier `main.c`, incluant tous les autres fichiers et contenant la boucle principale permettant de faire tourner *fsh*. Les autres fichiers ont une responsabilité isolée pour chaque fonctionnalité du projet.
 
 - `main.c` :
     Point d'entrée principal du programme. Il initialise les composants essentiels, gère la boucle principale du shell, affiche et gère le prompt et transmet les commandes pour leur exécution.
@@ -28,7 +28,7 @@ La structure du projet peut être vue comme une **pyramide**. On a un fichier `m
     Gère la logique derrière l'exécution des commandes externes. L'exécution est gérée via des appels systèmes.
   
 - `if.c` :
-    Implémente la logique conditionnelle du shell, c'est à dire les *if* et les *else*.
+    Implémente la logique conditionnelle du shell, c'est-à-dire les *if* et les *else*.
 
 - `for.c` :
     Implémente la gestion des boucles for dans le shell.
@@ -116,14 +116,14 @@ Algorithme :
 
 Algorithme :
 
-    1. Calculer la longueur dynamique du prompt (limité a 30 caractères).
+    1. Calculer la longueur dynamique du prompt (limité à 30 caractères).
 
     2. Troncature du chemin courant si nécessaire.
 
-    3. Ajouter un indicateur de statut (succès ou erreur). A aussi un affichage spécial pour les erreurs et les signaux.
+    3. Ajouter un indicateur de statut (succès ou erreur), ou bien un affichage spécial en cas d’erreurs ou de signaux.
 
 
-#### 3.5. Gestions des variables
+#### 3.5. Gestion des variables
 - Description : Remplace les variables dans une commande par leur valeur correspondante.
 
 Algorithme :
@@ -214,9 +214,9 @@ Algorithme :
 
     3. Exécuter chaque commande et fermer les descripteurs inutilisés.
 
-#### 3.11. Gestions des commandes multiples
+#### 3.11. Gestion des commandes multiples
 - Description :
-    Une commande composée de plusieurs sous-commandes separées par `;` est décomposée et exécutée de manière séquentielle.
+    Une commande composée de plusieurs sous-commandes séparées par `;` est décomposée et exécutée de manière séquentielle.
 Algorithme :
 
     1. Diviser la commande à l'aide de strtok

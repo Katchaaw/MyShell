@@ -9,6 +9,9 @@
  
  * @return Le code de retour de la commande exécutée ou 1 en cas d'erreur.
  */
+
+extern int last_was_signal;
+
 int execute_external_command(char *cmd, char **args);
 
 #endif

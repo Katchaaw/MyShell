@@ -1,4 +1,11 @@
-#include "main.h"
+#include "if.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include "tokenizer.h"
+#include "commands.h"
+
 
 int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
     // Vérifie que la commande commence par "if"
@@ -18,7 +25,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
 
     // Vérifie si une accolade ouvrante '{' est présente après le prédicat
     if (i == *nb_tokens || strcmp(tokens[i], "{") != 0) {
-        fprintf(stderr, "Erreur : 'if' sans bloc { ... }\n");
+        perror("Erreur : 'if' sans bloc { ... }\n");
         return 1;
     }
     test_cmd[test_cmd_count] = NULL;
@@ -40,7 +47,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
 
     // Vérifie que les accolades sont bien équilibrées (autant d'ouvrantes que de fermantes).
     if (brace_count != 0) {
-        fprintf(stderr, "Erreur : blocs { ... } mal équilibrés\n");
+        perror("Erreur : blocs { ... } mal équilibrés\n");
         return 1;
     }
     int cmd1_end = i - 1; //Position de la dernière accolade fermante.
@@ -76,7 +83,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
         if (i < *nb_tokens - 1 && strcmp(tokens[i], "else") == 0) {
             i++; 
             if (strcmp(tokens[i], "{") != 0) {
-                fprintf(stderr, "Erreur : 'else' sans bloc { ... }\n");
+                perror("Erreur : 'else' sans bloc { ... }\n");
                 return 1;
             }
             i++; 
@@ -90,7 +97,7 @@ int handle_if_else(char **tokens, int *nb_tokens, int *last_return) {
                 i++;
             }
             if (brace_count != 0) {
-                fprintf(stderr, "Erreur : blocs { ... } mal équilibrés\n");
+                perror("Erreur : blocs { ... } mal équilibrés\n");
                 return 1;
             }
             int cmd2_end = i - 1;

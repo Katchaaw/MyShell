@@ -7,7 +7,7 @@ LIBS = -lreadline -lm # Gestion de libreadline
 TARGET = fsh
 SRC = src
 OUT = out
-OBJ = $(OUT)/main.o $(OUT)/commands.o $(OUT)/tokenizer.o $(OUT)/interns.o $(OUT)/prompt.o $(OUT)/externs.o $(OUT)/redirections.o $(OUT)/for.o $(OUT)/if.o
+OBJ = $(OUT)/main.o $(OUT)/commands.o $(OUT)/tokenizer.o $(OUT)/interns.o $(OUT)/prompt.o $(OUT)/externs.o $(OUT)/redirections.o $(OUT)/for.o $(OUT)/if.o $(OUT)/signaux.o $(OUT)/pipeline.o
 INCLUDE = $(SRC)/include
 
 # Compilation principale

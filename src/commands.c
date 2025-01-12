@@ -1,8 +1,16 @@
-#include "main.h"
-#define MAX_LENGTH 256
+#include "commands.h"
+#include <stdio.h>     
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include "tokenizer.h"
+#include "if.h"
+#include "for.h"
+#include "interns.h"
+#include "externs.h"
 
-// Permet de ne pas avoir le warning [-Wimplicit-function-declaration]
-int execute_external_command(char *cmd, char **args);
 
 char *args_to_cmd(char **args) {
     if (args == NULL) return NULL;
@@ -61,28 +69,42 @@ void replaceVariable(char *command, char variable, const char *replacement) {
 
 
 int execute_command(const char *cmd, const char *file, const char *directory,char variable) {
-
+    
     char command[1024];
     snprintf(command, sizeof(command), "%s", cmd);
-
-    
     char *command_cop = strdup(command);
     char *res = command_cop;
 
-    // Gestion des commandes multiples - séparées par ';'.
-    if ((strstr(res, ";")) != NULL){
-        if ((strstr(res, "for")) == NULL || (strstr(res, "; for")) != NULL){
-        char *cmd1 = strtok(command_cop, ";");
-        char *cmd2 = strtok(NULL, "\0");
+    int nAcc = 0;
+    int nPV = 0;
 
-        execute_command(cmd1, file, directory, variable);
-        int result = execute_command(cmd2, file, directory, variable);
-            
-        free(command_cop);
-
-        return result;
+    // Gestion principale des séquences 
+    while(*res!='\0'){
+        if (*res == '{') nAcc ++;
+        if (*res == '}') nAcc --;
+        if (*res == ';'){
+            if (nAcc==0){
+                char concat[MAX_CMD_LENGTH] = {0};
+                char *cut=strtok(command_cop,";");
+                strcat(concat,cut);
+                for (int i =0; i<nPV ; i++){
+                    strcat(concat,";");
+                    cut = strtok(NULL,";");
+                    strcat(concat,cut);
+                }
+                char *cmd2 = strtok(NULL,"\0");
+                int result = execute_command(concat, file, directory, variable);
+                if (last_was_signal !=2){
+                    result = execute_command(cmd2, file, directory, variable);
+                }
+                free(cut);
+                return result;
+            }
+            else nPV++;
         }
+        res++;
     }
+
     free(command_cop);
 
     // Remplacement des variables dans la commande.
@@ -142,6 +164,6 @@ int execute_command(const char *cmd, const char *file, const char *directory,cha
     }
 
     free(command_copy);
-    fprintf(stderr, "Erreur: commande vide après substitution\n");
+    perror("Erreur: commande vide après substitution\n");
     return 1;
 }

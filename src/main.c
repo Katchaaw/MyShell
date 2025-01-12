@@ -1,14 +1,29 @@
 #include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <signal.h>
+#include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <stddef.h>
+
 
 int main() {
-    char *line; // Ligne lue depuis l'entrée utilisateur
-    int last_return = 0; // Code de retour de la dernière commande
+    char *line;                // Ligne lue depuis l'entrée utilisateur
+    int last_return = 0;       // Code de retour de la dernière commande
     char *tokens[MAX_TOKENS];  // Tableau pour stocker les tokens
-    int nb_tokens = 0;  // Nombre de tokens extraits
+    int nb_tokens = 0;         // Nombre de tokens extraits
 
-    rl_outstream = stderr; // Redirige la sortie de readline vers stderr
+    rl_outstream = stderr;     // Redirige la sortie de readline vers stderr
 
     save_redirections();
+
+    setup_signals();
 
     while (1) {
         reset_redirections();
@@ -39,12 +54,26 @@ int main() {
             continue;
         }
 
+        // Gestions des séquences
+        if (strstr(copy_line,";") && !strstr(copy_line,"for") && !strstr(copy_line,"if")){
+            last_return = execute_command(copy_line,NULL,NULL,'a');
+            continue;
+        }
+
         // Tokenisation de la ligne
         tokenizer(copy_line, tokens, &nb_tokens, " ");
         free(copy_line);
 
-        // Appel à la gestion des redirections
-        if (handle_redirections(tokens, &nb_tokens) == 1) {
+        // Gestion des pipelines
+        if (check_pipe(tokens) == 1) {
+            if (handle_pipe(tokens) == 0) {
+                free(line);
+                continue;
+            }
+        } 
+        
+        // Gestions des redirections
+        else if (handle_redirections(tokens, &nb_tokens) == 1) {
             last_return = 1;
             free(line);
             continue;
@@ -59,6 +88,7 @@ int main() {
             strcat(line, tokens[i]);  // Concatène chaque token à 'line'
         }
 
+        // Gestion des if/else
         if (strcmp(tokens[0], "if") == 0) {
             if (handle_if_else(tokens, &nb_tokens, &last_return) == 0) {
                 free(line);
@@ -83,7 +113,13 @@ int main() {
 
         //Gestion des boucles for
         else if (strcmp(command, "for") == 0) {
-            handle_for(arg, &last_return);
+            char concat[MAX_CMD_LENGTH] = {0};
+            char *suite_cmd = strtok(NULL,"\0");
+            strcat(concat,"for ");
+            strcat(concat,arg);
+            strcat(concat," ");
+            strcat(concat,suite_cmd);
+            last_return = execute_command(concat,NULL,NULL,'\0');
             free(line);
             continue;
         }

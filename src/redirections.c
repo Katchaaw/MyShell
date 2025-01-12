@@ -1,4 +1,12 @@
-#include "main.h"
+#include "redirections.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 
 static int saved_stdin, saved_stdout, saved_stderr;
 
@@ -6,16 +14,16 @@ int handle_redirections(char **tokens, int *nb_tokens) {
 
     // Parcours des tokens pour identifier les redirections.
     for (int i = 0; i < *nb_tokens; i++) {
-        int fd = -1; // Descripteur de fichier
+        int fd = -1;        // Descripteur de fichier
         int target_fd = -1; // Descripteur de fichier cible : entrée, sortie ou erreur
-        int flags = 0; // Drapeaux pour l'ouverture des fichiers
+        int flags = 0;      // Drapeaux pour l'ouverture des fichiers
 
         // Identifie le type de redirection
         if (strcmp(tokens[i], "<") == 0) {
             target_fd = STDIN_FILENO; // Redirection de l'entrée standard
-            flags = O_RDONLY; // Ouverture en lecture seule
+            flags = O_RDONLY;         // Ouverture en lecture seule
         } else if (strcmp(tokens[i], ">") == 0) {
-            target_fd = STDOUT_FILENO; // Redirection de sortie
+            target_fd = STDOUT_FILENO;  // Redirection de sortie
             flags = O_WRONLY | O_CREAT | O_EXCL; // Echec si fichier existe déjà
         } else if (strcmp(tokens[i], ">|") == 0) {
             target_fd = STDOUT_FILENO;
@@ -38,7 +46,7 @@ int handle_redirections(char **tokens, int *nb_tokens) {
 
         // Vérifie qu'un fichier suit l'opérateur
         if (i + 1 >= *nb_tokens) {
-            fprintf(stderr, "Erreur: fichier manquant après l'opérateur %s\n", tokens[i]);
+            perror("Erreur: fichier manquant après l'opérateur\n");
             return 1;
         }
 
@@ -58,7 +66,7 @@ int handle_redirections(char **tokens, int *nb_tokens) {
             return 1;
         }
 
-        close(fd); //Ferme le descripteur de fichier
+        close(fd); // Ferme le descripteur de fichier
 
         // Libère la mémoire des éléments supprimés du tableau
         if (tokens[i]) {

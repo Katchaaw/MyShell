@@ -114,6 +114,7 @@ int fsh_ftype(const char *path) {
 
 
 int handle_interns(char *command, char *arg, int *last_return) {
+
     // Vérification supplémentaire pour les arguments multiples
     if (strcmp(command, "cd") == 0) {
         if (arg && strtok(NULL, " ") != NULL) { // Plus d'un argument détecté
@@ -123,6 +124,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
         }
         *last_return = fsh_cd(arg);
     }
+
     else if (strcmp(command, "pwd") == 0) {
         if (arg) { // pwd ne prend pas d'arguments
             const char *msg_prefix = "pwd: ";
@@ -135,6 +137,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
         }
         *last_return = fsh_pwd();
     }
+
     else if (strcmp(command, "exit") == 0) {
         if (arg && strtok(NULL, " ") != NULL) { // Plus d'un argument détecté
             perror("exit: too many arguments\n");
@@ -145,6 +148,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
         fsh_exit(exit_code);
         return -1; 
     }
+
     else if (strcmp(command, "ftype") == 0) {
         if (!arg || strtok(NULL, " ") != NULL) { // Pas d'argument ou trop d'arguments
             perror("ftype: invalid number of arguments\n");
@@ -153,6 +157,7 @@ int handle_interns(char *command, char *arg, int *last_return) {
         }
         *last_return = fsh_ftype(arg);
     }
+    
     else {
         return 1; // Commande non interne
     }

@@ -80,44 +80,43 @@ int fsh_for(const char *rep, const char *cmd, int opt_A, int opt_r, const char *
         }
 
         // Gestion de l'option -p (traitement parallèle)
-        if (opt_p) {
-            // Attendre si le nombre de processus actifs atteint max_p
-            while (active_processes >= max_p) {
-                int status;
-                wait(&status);
-                active_processes--;
+if (opt_p) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        // Processus enfant
+        exit(execute_command(cmd, filepath, filepath, variable));
+    } else if (pid > 0) {
+        // Processus parent
+        active_processes++;
+    } else {
+        perror("Erreur lors de la création du processus");
+        closedir(dir);
+        return 1;
+    }
 
-                // Récupérer la valeur de retour du processus enfant
-                if (WIFEXITED(status)) {
-                    int child_return = WEXITSTATUS(status);
-                    if (child_return > last_return) {
-                        last_return = child_return;
-                    }
-                } else {
-                   perror("Un processus enfant s'est terminé anormalement.\n");
+    // Mise à jour après l'attente d'un processus
+    while (active_processes >= max_p) {
+        int status;
+        pid_t child_pid = wait(&status);
+        if (child_pid > 0) {
+            active_processes--;
+
+            if (WIFEXITED(status)) {
+                int child_return = WEXITSTATUS(status);
+                if (child_return > last_return) {
+                    last_return = child_return;
                 }
             }
-
-            pid_t pid = fork();
-            if (pid == 0) {
-                // Processus enfant
-                exit(execute_command(cmd, filepath, filepath, variable));
-            } else if (pid > 0) {
-            // Processus parent
-            active_processes++;
-            } else {
-                perror("Erreur lors de la création du processus");
-                closedir(dir);
-                return 1;
-           }
-        } else {
-
-            // Exécution séquentielle si -p n'est pas activé
-            int last_returnTemp = execute_command(cmd, filepath, filepath, variable);
-            if (last_returnTemp > last_return) {
-                last_return = last_returnTemp;
-            }
         }
+    }
+} else {
+    // Exécution séquentielle
+    int current_return = execute_command(cmd, filepath, filepath, variable);
+    if (current_return > last_return) {
+        last_return = current_return;
+    }
+}
+
     }
 
     // Attendre la fin de tous les processus enfants

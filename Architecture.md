@@ -3,35 +3,37 @@
 
 ## Introduction
 
-Ce document explique la stratégie adoptée pour réaliser le projet, en détaillant l'architecture logicielle, les structures de données et les algorithmes principaux implementés.
+Ce document explique la stratégie adoptée pour réaliser le projet, en détaillant l'architecture logicielle, les structures de données et les algorithmes principaux implémentés.
 
 ## 1. Architecture logicielle
 
-La structure du projet peut être vue comme une **pyramide**. On a un fichier `main.c`, incluant tous les autres fichiers et contenant la boucle principale permettant de faire tourner *fsh*. Les autres fichiers ont une responsabilité isolée pour chaque fonctionnalité du projet.
+La structure du projet peut être vue sous la forme d'une **pyramide**. On a un fichier `main.c`, incluant tous les autres fichiers et contenant la boucle principale permettant de faire tourner `fsh`. Chacun des autres fichiers gère une fonctionnalité isolée du projet.
+
+Consulter le diagramme de classes à la fin de cette section pour une représentation visuelle de l'architecture.
 
 - `main.c` :
     Point d'entrée principal du programme. Il initialise les composants essentiels, gère la boucle principale du shell, affiche et gère le prompt et transmet les commandes pour leur exécution.
 
-- `Commands.c` :
-    Gère l'exécution des commandes, qu'elles soient internes, conditionnelles (if/else), en boucles (for) ou externes.
+- `commands.c` :
+    Gère l'exécution des commandes internes, conditionnelles, en boucles ou externes.
 
-- `Tokenizer.c` :
+- `tokenizer.c` :
     Réalise la tokenisation des commandes en arguments exploitables par les différents composants.
 
 - `prompt.c`:
     Gère l'affichage dynamique du prompt du shell.
 
 - `interns.c`  :
-    Gère la logique derrière l'exécution des commandes internes du shell - comme `cd`, `exit` ou encore `pwd`.
+    Gère la logique derrière l'exécution des commandes internes du shell.
  
 - `externs.c` :
     Gère la logique derrière l'exécution des commandes externes. L'exécution est gérée via des appels systèmes.
   
 - `if.c` :
-    Implémente la logique conditionnelle du shell, c'est-à-dire les *if* et les *else*.
+    Implémente la logique conditionnelle du shell, c'est-à-dire les `if` et les `else`.
 
 - `for.c` :
-    Implémente la gestion des boucles for dans le shell.
+    Implémente la gestion des boucles `for` dans le shell.
 
 - `signaux.c` :
     Gère les signaux pour permettre une interruption propre des commandes en cours. 
@@ -40,38 +42,39 @@ La structure du projet peut être vue comme une **pyramide**. On a un fichier `m
     Implémente la gestion des redirections d'entrée/sortie standard et des erreurs.
 
 - `pipeline.c` :
-    Gère les pipelines permettant de chaîner plusieurs commandes via le caractère '|'.
+    Gère les pipelines permettant de chaîner plusieurs commandes via le caractère ' | '.
 
 
-### Diagramme de classe
-[Diagramme de classe](Architecture_de_classes.pdf)
+### Représentation graphique de l'architecture du projet
+[Diagramme de classes](Architecture_de_classes.pdf)
 
 
 ## 2. Structures de données
 
 #### 2.1 Tokens
 - Description : Les commandes sont découpées en tokens (arguments) sous formes de tableaux de chaînes de caractères.
-- Exemple : `char *tokens[MAX_TOKENS]; int nb_tokens;`
+
+    - `char *tokens[MAX_TOKENS]; int nb_tokens;`
 
 #### 2.2. Command Buffer
 
 - Description : Les commandes sont stockées dans des buffers temporaires pour permettre leur manipulation et leur modification (comme le remplacement de variables).
 
-- Exemple : `char command[MAX_LENGTH];` 
+    - `char command[MAX_LENGTH];` 
 
 #### 2.3. Gestion des redirections
 
 - Description : Utilisation de descripteurs de fichiers pour sauvegarder et restaurer les entrées/sorties standards.
 
-- Exemple : `static int saved_stdin, saved_stdout, saved_stderr;`
+    - `static int saved_stdin, saved_stdout, saved_stderr;`
 
 #### 2.4. Gestion des signaux
 
-- Description : Variables atomiques pour détecter et réagir aux signaux reçus.
+- Description : Des variables atomiques pour détecter et réagir aux signaux reçus.
 
-- Exemple : 
-    `volatile sig_atomic_t was_interrupted;`
-    `volatile sig_atomic_t last_signal;`
+
+    - `volatile sig_atomic_t was_interrupted;`
+    - `volatile sig_atomic_t last_signal;`
 
 
 ## 3. Algorithmes implémentés
@@ -82,14 +85,14 @@ La structure du projet peut être vue comme une **pyramide**. On a un fichier `m
 
 Algorithme :
     
-    1. Utiliser strtok pour découper la commande.
+    1. Utiliser `strtok()` pour découper la commande.
 
     2. Duplique chaque token dans un tableau dynamique.
 
 
 #### 3.2. Gestion des commandes internes
 - Description : 
-    Exécute des commandes internes comme cd, exit, ou pwd.
+    Exécute des commandes internes comme `cd`, `exit` ou `pwd`.
 
 Algorithme :
 
@@ -104,11 +107,11 @@ Algorithme :
 
 Algorithme :
 
-    1. Localiser le programme via le PATH.
+    1. Localiser le programme via le `PATH`.
 
-    2. Créer un processus enfant avec fork.
+    2. Créer un processus enfant avec `fork()`.
 
-    3. Exécuter la commande avec execvp.
+    3. Exécuter la commande avec `execvp()`.
 
 #### 3.4. Gestion du prompt
 
@@ -118,7 +121,7 @@ Algorithme :
 
     1. Calculer la longueur dynamique du prompt (limité à 30 caractères).
 
-    2. Troncature du chemin courant si nécessaire.
+    2. Troncature du répertoire courant si nécessaire.
 
     3. Ajouter un indicateur de statut (succès ou erreur), ou bien un affichage spécial en cas d’erreurs ou de signaux.
 
@@ -128,13 +131,13 @@ Algorithme :
 
 Algorithme :
 
-    1. Parcourir la commande pour identifier les occurrences de $variable.
+    1. Parcourir la commande pour identifier les occurrences de `$variable`.
 
     2. Utiliser un buffer temporaire pour reconstruire la commande :
 
-        - Copier la partie avant $variable.
+        - Copier la partie avant `$variable`.
 
-        - Insérer la valeur associée à variable.
+        - Insérer la valeur associée à `$variable`.
 
         - Copier la partie restante de la commande.
 
@@ -146,13 +149,13 @@ Algorithme :
 
 Algorithme :
 
-    1. Identifier le début de la condition avec if.
+    1. Identifier le début de la condition avec `if`.
 
     2. Analyser l'expression conditionnelle :
 
         - Exécuter la commande associée si la condition est vraie.
 
-        - Si une clause else existe, exécuter la commande associée si la condition est fausse.
+        - Si une clause `else` existe, exécuter la commande associée lorsque la condition est fausse.
 
     3. Gérer les imbrications potentielles des conditions.
 
@@ -185,9 +188,9 @@ Algorithme :
 
     1. Identifier les opérateurs dans les tokens.
 
-    2. Ouvrir les fichiers appropriés avec open et rediriger avec dup2.
+    2. Ouvrir les fichiers appropriés avec `open()` et rediriger avec `dup2()`.
 
-    3. Supprimer les tokens associés aux redirections
+    3. Supprimer les tokens correspondant aux redirections.
 
 
 
@@ -196,15 +199,15 @@ Algorithme :
 
 Algorithme :
 
-    1. Installer les gestionnaires avec sigaction.
+    1. Installer les gestionnaires avec `sigaction()`.
 
-    2. Si l'exécution d'une commande est interrompue par la réception d'un signal (SIGTERM), on l'indique à prompt en mettant `was_interrupted` à 1.
+    2. Si l'exécution d'une commande est interrompue par la réception d'un signal `SIGTERM`, on l'indique à prompt en mettant `was_interrupted` à 1.
 
-    3. Si on capte SIGINT, on arrête l'exécution, notamment les commandes structurées (notamment les boucles) et on ne lance plus de nouveau processus.
+    3. Si on capte `SIGINT`, on arrête l'exécution, notamment les commandes structurées et on ne lance plus de nouveau processus.
 
 
 #### 3.10. Gestion des pipelines
-- Description : Implémente la communication entre commandes via les pipelines ('|').
+- Description : Implémente la communication entre commandes via les pipelines ' | '.
 
 Algorithme :
 
@@ -216,12 +219,13 @@ Algorithme :
 
 #### 3.11. Gestion des commandes multiples
 - Description :
-    Une commande composée de plusieurs sous-commandes séparées par `;` est décomposée et exécutée de manière séquentielle.
+    Une commande composée de plusieurs sous-commandes séparées par des ' __;__ ' est décomposée et exécutée de manière séquentielle.
+
 Algorithme :
 
-    1. Diviser la commande à l'aide de strtok
+    1. Diviser la commande à l'aide de `strtok()`.
 
-    2. Appeler récursivement `execute_command` pour chaque sous-commande
+    2. Appeler récursivement `execute_command()` pour chaque sous-commande.
 
 
 #### 3.12. Gestion des commandes structurées
@@ -233,6 +237,6 @@ Algorithme :
 
     2. Appliquer les algorithmes appropriés à chaque sous-partie.
 
-    3. Combiner les résultats pour produire l'exécution finale - 
+    3. Combiner les résultats pour produire l'exécution finale.
 
-    4. La valeur de retour sera toujours la valeur de retour de la dernière exécution concluante. Cela permet de garder un résultat cohérent si jamais on a SIGINT.
+    4. La valeur de retour correspondra toujours à celle de la dernière exécution réussie. Cela permet de garder un résultat cohérent même en cas de réception d'un signal SIGINT.

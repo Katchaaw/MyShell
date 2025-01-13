@@ -9,7 +9,7 @@ Ce document explique la stratégie adoptée pour réaliser le projet, en détail
 
 La structure du projet peut être vue sous la forme d'une **pyramide**. On a un fichier `main.c`, incluant tous les autres fichiers et contenant la boucle principale permettant de faire tourner `fsh`. Chacun des autres fichiers gère une fonctionnalité isolée du projet.
 
-Consulter le diagramme de classes à la fin de cette section pour une représentation visuelle de l'architecture.
+*[Consulter le diagramme de classes à la fin de cette section pour une représentation visuelle de l'architecture]*
 
 - `main.c` :
     Point d'entrée principal du programme. Il initialise les composants essentiels, gère la boucle principale du shell, affiche et gère le prompt et transmet les commandes pour leur exécution.
@@ -24,7 +24,7 @@ Consulter le diagramme de classes à la fin de cette section pour une représent
     Gère l'affichage dynamique du prompt du shell.
 
 - `interns.c`  :
-    Gère la logique derrière l'exécution des commandes internes du shell.
+    Gère la logique derrière l'exécution des commandes internes du shell (`exit`, `cd`, `pwd`...).
  
 - `externs.c` :
     Gère la logique derrière l'exécution des commandes externes. L'exécution est gérée via des appels systèmes.
@@ -121,7 +121,7 @@ Algorithme :
 
     1. Calculer la longueur dynamique du prompt (limité à 30 caractères).
 
-    2. Troncature du répertoire courant si nécessaire.
+    2. Troncature du chemin courant si nécessaire.
 
     3. Ajouter un indicateur de statut (succès ou erreur), ou bien un affichage spécial en cas d’erreurs ou de signaux.
 
@@ -239,4 +239,4 @@ Algorithme :
 
     3. Combiner les résultats pour produire l'exécution finale.
 
-    4. La valeur de retour correspondra toujours à celle de la dernière exécution réussie. Cela permet de garder un résultat cohérent même en cas de réception d'un signal SIGINT.
+    4. La valeur de retour correspondra toujours à celle de la dernière exécution réussie. Cela permet de garder un résultat cohérent, même en cas de réception d'un signal SIGINT.

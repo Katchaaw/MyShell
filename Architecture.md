@@ -45,7 +45,7 @@ Consulter le diagramme de classes à la fin de cette section pour une représent
     Gère les pipelines permettant de chaîner plusieurs commandes via le caractère ' | '.
 
 
-### Représentation graphique de l'architecture du projet
+### Diagramme de classes
 [Diagramme de classes](Architecture_de_classes.pdf)
 
 
@@ -54,27 +54,27 @@ Consulter le diagramme de classes à la fin de cette section pour une représent
 #### 2.1 Tokens
 - Description : Les commandes sont découpées en tokens (arguments) sous formes de tableaux de chaînes de caractères.
 
-    - `char *tokens[MAX_TOKENS]; int nb_tokens;`
+    - Exemple : `char *tokens[MAX_TOKENS]; int nb_tokens;`
 
 #### 2.2. Command Buffer
 
 - Description : Les commandes sont stockées dans des buffers temporaires pour permettre leur manipulation et leur modification (comme le remplacement de variables).
 
-    - `char command[MAX_LENGTH];` 
+    - Exemple : `char command[MAX_LENGTH];` 
 
 #### 2.3. Gestion des redirections
 
 - Description : Utilisation de descripteurs de fichiers pour sauvegarder et restaurer les entrées/sorties standards.
 
-    - `static int saved_stdin, saved_stdout, saved_stderr;`
+    - Exemple : `static int saved_stdin, saved_stdout, saved_stderr;`
 
 #### 2.4. Gestion des signaux
 
 - Description : Des variables atomiques pour détecter et réagir aux signaux reçus.
 
-
-    - `volatile sig_atomic_t was_interrupted;`
-    - `volatile sig_atomic_t last_signal;`
+    - Exemple : 
+        - `volatile sig_atomic_t was_interrupted;`
+        - `volatile sig_atomic_t last_signal;`
 
 
 ## 3. Algorithmes implémentés
